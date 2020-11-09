@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 from .models import Post
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 class HomeView(ListView):
@@ -18,13 +19,25 @@ class RecipeDetailView(DetailView):
 class RecipeCreateView(CreateView):
     model = Post
     fields = '__all__'
+    template_name = 'recipe_form.html'
 
 
 class RecipeUpdateView(UpdateView):
     model = Post
-    fields = '__all__'
+    fields = ['title', 'body']
+    template_name = 'recipe_form.html'
 
 
-class RecipeDelete(DeleteView):
+class RecipeDeleteView(DeleteView):
     model = Post
     success_url = reverse_lazy('home')
+    template_name = 'recipe_confirm_delete.html'
+
+
+class RecipeByUserListView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'recipe_list_user.html'
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user)
+

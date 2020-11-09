@@ -3,12 +3,11 @@
 {% block title %}<title>Kittchen Monster Home</title>{% endblock %}
 
 {% block content %}
-<h1>Kittchen Monster</h1>
+<h1>Latest Recipes</h1>
 {% for blog in recipe_list%}
   <li>
     <a href="{{blog.get_absolute_url}}"> {{blog.title}}</a>
   </li>
   {% endfor %}
-  
 
 {% endblock %}
