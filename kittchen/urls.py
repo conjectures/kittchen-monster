@@ -21,7 +21,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/', include('recipeBlog.urls')),
+    path('home/', include('recipe-blog.urls')),
     path('', RedirectView.as_view(url='home/', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
