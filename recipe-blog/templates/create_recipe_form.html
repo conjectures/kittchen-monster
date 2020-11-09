@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}<title> Create Recipe </title>{% endblock%}
+{% block content %}
+  <h1>Create Recipe</h1>
+  <form action="" method="post">
+    {% csrf_token %}
+    {% for hidden_field in form.hidden_fields %}
+      {{ hidden_field }}
+    {% endfor %}
+    <p class="form-group">Author: {{ user.get_username }}</p>
+    {% for field in form.visible_fields %}
+      <div class="form-group">
+        {{field.label_tag}}
+        {{field}}
+        {% if field.help_text %}
+          <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif%}
+
+      </div>
+    {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Submit">
+    {% if post %}
+      <a class="btn btn-danger" href="{% url 'recipe_delete' post.id %}" >Delete</a>
+    {% endif %}
+  </form>
+{% endblock %}
