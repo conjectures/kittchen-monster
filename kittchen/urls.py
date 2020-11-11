@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     #
-    path('home/', include('recipe-blog.urls')),
+    path('home/', include('core.urls')),
     path('', RedirectView.as_view(url='home/', permanent=True)),
 
     # AUTH

@@ -15,6 +15,21 @@
 <p><strong>by {{ post.author }}</strong></p>
 <p>Date posted: {{post.post_date}}</p>
 <p>{{ post.body }}</p>
+<h2>Ingredients</h2>
+<ul>
+{%for ing in post.ingredienttable_set.all %}
+<p>{{ing.quantity}} {{ing.unit}} {{ing.ingredient}}</p>
+{% endfor %}
+</ul>
+
+<h2>Method</h2>
+<ul>
+{%for direction in post.directions.all %}
+<p>{{direction.position}}. {{direction.body}}</p>
+{% endfor %}
+</ul>
+
+
 
 
 {% endblock %}
