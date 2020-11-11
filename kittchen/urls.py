@@ -18,12 +18,20 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth import views
 
 urlpatterns = [
+    # ADMIN
     path('admin/', admin.site.urls),
+
+    #
     path('home/', include('recipe-blog.urls')),
     path('', RedirectView.as_view(url='home/', permanent=True)),
-    path('accounts/', include('django.contrib.auth.urls')),
+
+    # AUTH
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -2,7 +2,7 @@ import pdb
 
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
-from .models import Post
+from .models import Post, Ingredient
 from django.urls import reverse_lazy, reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -19,8 +19,6 @@ class HomeView(ListView):
 class RecipeDetailView(DetailView):
     model = Post
     template_name = 'recipe_detail.html'
-
-
 
 
 class RecipeUpdateView(UpdateView):
@@ -73,3 +71,10 @@ def createRecipeView(request):
     else:
         form = AddPostModelForm()
     return render(request, 'create_recipe_form.html', {'form': form})
+
+
+def IngredientsAddView(request):
+    context = {}
+    return render(request, 'ingredients_form.html', context=context)
+
+

@@ -1,37 +1,43 @@
 {% extends "base.html" %}
+{% block navbar%}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href={% url 'home' %}>Kittchen Monster</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
+{% endblock %}
 
 {% block content %}
+    <h1 class="title">Log In</h1>
 
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
-  
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
+    {% if form.errors %}
+      <p>Your username and password didn't match. Please try again.</p>
     {% endif %}
-  {% endif %}
-  
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-      <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-      </tr>
-      <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
-    <input type="submit" value="Login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
-  
-  {# Assumes you setup the password_reset view in your URLconf #}
-  {#}  <p><a href="{% url 'password_reset' %}">Lost password?</a></p> {#}
-  
+
+    {% if next %}
+      {% if user.is_authenticated %}
+        <p>Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.</p>
+      {% else %}
+        <p>Please login to see this page.</p>
+      {% endif %}
+    {% endif %}
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <table>
+        <tr>
+          <td>{{ form.username.label_tag }}</td>
+          <td>{{ form.username }}</td>
+        </tr>
+        <tr>
+          <td>{{ form.password.label_tag }}</td>
+          <td>{{ form.password }}</td>
+        </tr>
+      </table>
+      <input class="btn btn-primary" type="submit" value="Login" />
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+    {# Assumes you setup the password_reset view in your URLconf #}
+    {#}  <p><a href="{% url 'password_reset' %}">Lost password?</a></p> {#}
 {% endblock %}
