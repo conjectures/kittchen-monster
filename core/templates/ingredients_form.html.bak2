@@ -23,15 +23,10 @@
 </div>
 -->
 <div id="shopping-list">
-  <h2>Add ingredients</h2>
-  <div id='component-demo'>
-    <form-top></form-top>
-  </div>
-  <!--
+  <h2>List</h2>
   <input type="text" class="form-control" placeholder="New ingredient"
     v-model="newIngredient" @keyup.enter="addIngredient">
-  -->
-  <p><small><em> Number of ingredients: [[itemNum]]</em></small></p>
+  <p> Numnber of ingredients: [[itemNum]]</p>
   </br> 
   <div class="list-group">
     <div class="list-group-item d-flex justify-content-between align-items-center" 
@@ -46,44 +41,17 @@
       </button>
     </div>
   </div>
-  <p>{{ form.as_p}}</p>
 
 </div>
 
-
-
 {% endblock %}
-<!--
-  <p>{{unit}} {{unit.ingredienttable_set.get_unit_display}} </p>
-
--->
+<!-- -->
+<!-- -->
 <!-- -->
 
 
 {% block scripts %}
 <script>
-
-  Vue.component('form-top', {
-    delimiters: ['[[', ']]'],
-    props: ['text'],
-    template:
-    `<div class="input-group">
-      <input type="text" class="form-control input-large" placeholder="New ingredient">
-      <select class="custom-select" id="inputGroupSelect01">
-        <option selected> </option>
-        <option>unit</option>
-        {% for unit in recipes%}
-        <option>{{unit}}</option>
-        {% endfor %}
-      </select>
-
-      <input type="text" class="form-control input-small" placeholder="Quantity">
-      <button class="btn btn-outline-secondary" type="button">Ok</button>
-    </div>
-    `
-  })
-  new Vue({ el: '#component-demo', })
-
   var vm = new Vue({
     el: '#shopping-list',
     delimiters: ["[[", "]]"],

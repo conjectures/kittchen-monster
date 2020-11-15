@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 # Post
 class Post(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # delete blogs of deleted user
     ingredients = models.ManyToManyField('Ingredient', through='IngredientTable', help_text='Input ingredients', blank=True)
     body = models.TextField(max_length=1000, help_text='Recipe body')
@@ -61,6 +61,9 @@ class IngredientTable(models.Model):
     def __str__(self):
         return f"{self.quantity} {self.unit} of {self.ingredient} for {self.post.title}"
 
+    def get_units(self):
+        return self.get_unit_display()
+
 
 class Direction(models.Model):
     recipe = models.ForeignKey(Post, related_name='directions', on_delete=models.CASCADE)
@@ -68,7 +71,7 @@ class Direction(models.Model):
     body = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"Direction {self.position} for {self.recipe.title}"
+        return f"Direction {self.position} for {self.recipe.title}: {self.body}"
 
 
 
