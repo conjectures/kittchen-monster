@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from .models import *
 from .utils.forms import is_empty_form, is_form_persisted
-from django.forms.models import BaseInlineFormSet, inlineformset_factory
+from django.forms.models import BaseInlineFormSet, inlineformset_factory, modelformset_factory
 
 
 IngredientFormset = inlineformset_factory(
@@ -13,6 +13,31 @@ IngredientFormset = inlineformset_factory(
         IngredientTable,
         fields=('ingredient', 'unit', 'quantity'),
         extra=1)
+
+
+class IngredientModelForm(forms.ModelForm):
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
+        widgets = {
+                'name': forms.TextInput(attrs={
+                    'class': 'form-control',
+                    'width': '100%',
+                    'margin': '0',
+                    'padding': '0',
+                    })
+                }
+
+    def clean_name(self, *args, **kwargs):
+        name = self.cleaned_data.get("name")
+        if Ingredient.objects.filter(name=name).exists():
+            raise ValidationError(_(f"The ingredient name '{name}'' already exists"))
+
+        return name
+
+
+IngredientModelFormset = modelformset_factory(Ingredient, form=IngredientModelForm, fields=('name',))
 
 
 class AddPostModelForm(forms.ModelForm):
@@ -51,21 +76,19 @@ class PostModelForm(forms.ModelForm):
         return title
 
 
-class IngredientModelForm(forms.ModelForm):
-
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
-        widgets = {
-                'name': forms.TextInput(attrs={'class': 'form-control'})
-                }
-
-
 class IngredientTableModelForm(forms.ModelForm):
     class Meta:
         model = IngredientTable
         fields = ('unit', 'quantity')
         widgets = {
+                'unit': forms.Select(attrs={
+                    'class': 'form-control',
+                    'style': 'width: 40%',
+                    }),
+                'quantity': forms.NumberInput(attrs={
+                    'class': 'form-control',
+                    'style': 'width: 50%',
+                    })
                 }
 
 
@@ -73,6 +96,53 @@ class DirectionForm(forms.ModelForm):
     class Meta:
         model = Direction
         fields = '__all__'
+
+
+class IngredientWithTableForm(BaseInlineFormSet):
+    """
+    Base formset with ingredient and ingredietntable forms
+    """
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        form.nested = IngredientModelForm()
+        pass
+
+#    def is_adding_nested_inlines_to_empty_form(self, form):
+#        pass
+
+    def is_valid(self):
+        for form in self.forms:
+            if hasattr(form, 'nested'):
+                result = form.nested.is_valid()
+
+        return super().is_valid() and result
+
+    def clean(self):
+        for form in self.forms:
+            if not hasattr(form, 'nested') or self._should_delete_form(form):
+                continue
+            form.nested.clean()
+        super().clean()
+
+    def save(self, commit=True):
+
+        for form in self.forms:
+            print("TEST SAVE METHOD ~~~~")
+            print(form)
+            if hasattr(form, 'nested'):
+                form.nested.save(commit=True)
+        return
+
+
+PostIngredientTableFormset = inlineformset_factory(
+        Post,
+        IngredientTable,
+        fields=('unit', 'quantity'),
+        form=IngredientTableModelForm,
+        extra=1,
+        can_delete=False,
+        )
 
 
 class BaseRecipeWithIngredientTableFormset(BaseInlineFormSet):
@@ -143,15 +213,13 @@ class BaseRecipeWithIngredientTableFormset(BaseInlineFormSet):
                 if not self._should_delete_form(form):
                     form.nested.save(commit=commit)
         return result
-
-
-PostIngredientTableFormset = inlineformset_factory(
-        Post,
-        IngredientTable,
-        formset=BaseRecipeWithIngredientTableFormset,
-        fields=('ingredient','unit', 'quantity'),
-        extra=1
-        )
+#PostIngredientTableFormset = inlineformset_factory(
+#        Post,
+#        IngredientTable,
+#        formset=BaseRecipeWithIngredientTableFormset,
+#        fields=('qu'),
+#        extra=1
+#        )
 
 #class AddPostForm(forms.Form):
 #    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))

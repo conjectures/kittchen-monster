@@ -1,6 +1,7 @@
+import re
 
-#Source: https://github.com/philgyford/django-nested-inline-formsets-example/blob/main/publishing/utils/forms.py
 
+# Source: https://github.com/philgyford/django-nested-inline-formsets-example/blob/main/publishing/utils/forms.py
 def is_empty_form(form):
     """
     Considered empty if it passes validation but
@@ -24,3 +25,12 @@ def is_form_persisted(form):
         # Either form has no instance attached
         # or it has instance that is being added
         return False
+
+
+def get_name_with_flag(string, flag=None):
+    return re.findall(r"\%(\w*)\%", string)[0]
+
+
+def get_id_with_flag(string, flag=None):
+    return re.findall(r"-(\d*)-", string)[0]
+

@@ -3,5 +3,42 @@
     margin: 0;
 }
 
-div {
+.form-wrapper {
+    display: flex;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: center;
 }
+
+.form-items-wrapper {
+    display: inline-block;
+    flex: 1;
+    max-width: 100%;
+    margin-top: 1 auto;
+    text-align: center;
+}
+
+.no-marker {
+    padding: 0;
+    list-style-type: none;
+    display: table;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+li.item-add-list {
+     display: flex;
+     margin-top: 1em;
+     margin-bottom: 1em;
+ }
+ ul.errorlist {
+    list-style-type: none;
+    padding: 0;
+     margin-bottom: 0;
+ }
+
+form.ingredients{
+     display: flex;
+     max-width: 100%
+ }
+

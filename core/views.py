@@ -1,7 +1,9 @@
-import pdb
+import re
 from core.utils.debug import debug
+from core.utils.multiform import *
+from core.utils.forms import get_name_with_flag, get_id_with_flag
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, FormView
 from .models import *
 from django.urls import reverse_lazy, reverse
@@ -11,6 +13,11 @@ from django.contrib.auth.models import User
 from django.views.generic.detail import SingleObjectMixin
 from django.forms import inlineformset_factory, modelformset_factory
 from .forms import *
+from .forms import IngredientModelFormset
+
+
+from django.views.generic.base import View, TemplateResponseMixin
+from django.views.generic.edit import FormMixin, ProcessFormView
 
 
 class HomeView(ListView):
@@ -116,7 +123,12 @@ class RecipeAddView(CreateView):
 # View combining all components needed to add recipe
 class RecipeIngredientsAddView(SingleObjectMixin, FormView):
     model = Post
-    template_name = 'recipe_add_ingredients.html'
+    template_name = 'test_recipe_add_ingredients.html'
+    formsets = {
+            'recipe': PostModelForm,
+            'item': IngredientModelFormset,
+            'table': PostIngredientTableFormset,
+            }
     # overwrite 'need pk' function
 
 #    @debug
@@ -127,21 +139,78 @@ class RecipeIngredientsAddView(SingleObjectMixin, FormView):
     @debug
     def get(self, request, *args, **kwargs):
         # Post edited
-        self.object = self.get_object(queryset=Post.objects.all())
-        return super().get(request, *args, **kwargs)
+        self.object = self.get_object()
+        forms = self.get_form()
+        # print(f'get object: {self.object}')
+        return render(request, self.template_name, context={'forms': forms, 'recipe': self.object})
 
     # Construct form, check for validity and handle accordingly
     @debug
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Post.objects.all()) 
-        return super().post(request, *args, **kwargs)
+
+        self.object = self.get_object()
+        print(request.POST)
+        print()
+        print(f' Context data: {self.get_context_data()}')
+        print("KWARGS")
+        print(self.get_form_kwargs())
+
+        print()
+        action = request.POST.get('action')
+        form_id = get_id_with_flag(action)
+        form_name = get_name_with_flag(action)
+        # form_prefixes = self._get_prefixes()
+        forms = self.get_form()
+
+        # Find individual or group submit
+        if form_name in forms.keys():
+            # self._process_individual_form(form_name, form_id)
+            #klass = self.formsets.get(form_name)
+            form = IngredientModelFormset(request.POST or None, prefix='%item%')
+            print("TEST HERE ~~~~~~~~~~~~~~~~~~~~~~~")
+            print(form)
+            print("TEST HERE ~~~~~~~~~~~~~~~~~~~~~~~")
+            print()
+            print(f"Validating {form_name} with id {form_id}")
+
+            if form.is_valid():
+                print("~~~~\nFORM IS VALID\n~~~~")
+                return redirect('/home')
+            else:
+                print("~~~~\nNOT VALID\n~~~~")
+                forms['item'] = form
+                return render(request, self.template_name, context={'forms': forms, 'recipe': self.object})
+
+
+
+        #process individual
+        #process group
+        # get_form_kwargs required (to get POST info)
+        print(self.get_form_kwargs())
+        # return super().post(request, *args, **kwargs)
 
     # Get custom nested formset and pass in Post object
+    def _get_prefixes(self):
+        return self.formsets.keys()
+
+
     @debug
     def get_form(self, form_class=None):
+        args = self.get_form_kwargs()
+        # surround with '%' flag
+        prefixes = [f'%{x}%' for x in self._get_prefixes()]
+        # prefixes = [x for x in self._get_prefixes()]
 
-        return PostIngredientTableFormset(
-                **self.get_form_kwargs(), instance=self.object)
+        # TODO: 'pythonify - get names from self.formsests dictionary'
+        formPost = PostModelForm(instance=self.object, prefix=prefixes[0])
+        formIngredients = IngredientModelFormset(queryset=Ingredient.objects.filter(ingredienttable__post__id=self.object.id).order_by('ingredienttable'), prefix=prefixes[1])
+        formPostIngredientTable = PostIngredientTableFormset(instance=self.object, prefix=prefixes[2])
+
+        forms = {'recipe': formPost, 'item': formIngredients, 'table': formPostIngredientTable}
+
+        return forms
+
+#        return PostIngredientTableFormset( **self.get_form_kwargs(), instance=self.object)
 
     @debug
     def form_valid(self, form):
@@ -161,6 +230,49 @@ class RecipeIngredientsAddView(SingleObjectMixin, FormView):
     @debug
     def get_success_url(self):
         return reverse('recipe_detail', kwargs={'pk': self.object.pk})
+
+
+# class testView(MultiFormsView):
+#     model = Post
+#     template_name = 'test_recipe_add_ingredients.html'
+#     form_classes = {'recipe': PostModelForm,
+#                     'ingredients': IngredientModelFormset,
+#                     }
+#     # queries = {'ingredients': self.object.all()}
+#     
+#     # create modelformset
+#     # ingredientModelformset = modelformset_factory(Ingredient, fields=('name',))
+#     # instanciate form - self.object is post
+#     # form = ingredientModelformset(queryset=self.object['ingre'])
+# 
+#     def get_forms(self, form_classes, form_names=None):
+#         # forms = super().get_forms(form_classes)
+#         print("TEST HERE !! ~~~")
+#         formPost = PostModelForm()
+#         formIngredients = IngredientModelFormset()
+#         forms = {'recipe': formPost, 'ingredients': formIngredients}
+#         return forms
+#
+#        forms = 
+#
+#        return forms
+
+#    def _create_form(self, form_name, klass, *args, **kwargs):
+#        form_kwargs = self.get_form_kwargs(form_name)
+#        form_create_method = 'create_%s_form' % form_name
+#        if 
+#        print(f'Form kewyord arguments: {form_kwargs')
+#        print(f'Form create methods: {form_create_method}')
+#
+#        pass
+    #@debug
+    #def get(self, request, *args, **kwargs):
+    #    self.object = self.get_object(queryset=Post.objects.all())
+    #    return super().get(request, *args, **kwargs)
+
+    #@debug
+    #def get_form(self, form_class=None):
+    #    return testModelForm(**self.get_form_kwargs(), instance=self.object)
 
 
 #     # Create formset based on parent and child model

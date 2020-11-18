@@ -49,13 +49,13 @@ class IngredientTable(models.Model):
             (TSP, _('tsp')),
             (TBS, _('tbsp')),
             ]
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     unit = models.CharField(
             max_length=32,
             choices=UNIT,
             blank=True,
             )
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=8, decimal_places=3)           # store as character then make into integer
 
     def __str__(self):

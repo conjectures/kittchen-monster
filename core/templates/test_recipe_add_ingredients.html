@@ -1,0 +1,74 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}<title> Add Recipe</title>{% endblock%}
+
+{% block content %}
+  <h1>Add recipe:{{recipe.title}}</h1>
+  <p>Author: {{ user.get_username }}</p>
+  <form class="recipe" action="" method="post">
+    {%csrf_token%}
+    {{ forms.recipe.as_p }}
+    <input name='action' value='recipe' type="hidden" >
+  </form>
+
+  <h2>Add Ingredients</h2>
+  <div class="form-wrapper">
+    <div class="form-items-wrapper">
+      {% for itemform in forms.item %}
+    <form class="item" action="" method="post">
+          {%csrf_token%}
+          {{forms.item.management_form}}
+          {{ itemform.errors }}
+          {% for field in itemform.hidden_fields%}
+            {{ field}}
+          {% endfor %}
+          <ul class="no-marker">
+            <li class="item-add-list">
+            {% for field in itemform.visible_fields%}
+              {{ field}}
+            {% endfor %}
+            </li>
+          </ul>
+          <input name='action' value='{{itemform.id.auto_id}}' type="hidden" >
+      </form>
+    {% endfor %}
+    </div>
+    <div class="form-items-wrapper">
+    {{forms.table.management_form}}
+    {% for tableform in forms.table %}
+        <form class="table" action="" method="post">
+          {%csrf_token%}
+          {{ itemform.errors }}
+          {% for field in tableform.hidden_fields%}
+            {{ field}}
+          {% endfor %}
+          <ul class="no-marker">
+            <li class="item-add-list">
+          {% for field in tableform.visible_fields%}
+            {{ field}}
+          {% endfor %}
+            </li>
+          </ul>
+          <input name='action' value='{{tableform.id.auto_id}}' type="hidden" >
+        </form>
+    {% endfor %}
+    </div>
+  </div>
+
+
+{% endblock %}
+
+
+<!--
+    {% for hidden_field in form.hidden_fields %}
+      {{ hidden_field.errors }}
+      {{ hidden_field }}
+    {% endfor %}
+    {% csrf_token %}
+    {% for visible_field in form.visible_fields %}
+      {{ visible_field.errors }}
+      {{ visible_field }}
+    {% endfor %}
+-->
