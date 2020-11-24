@@ -1,0 +1,59 @@
+
+{% extends "base.html" %}
+
+{% block title %}<title> Add Recipe</title>{% endblock%}
+
+{% block content %}
+  <h1>Add recipe:{{recipe.title}}</h1>
+  <p>Author: {{ user.get_username }}</p>
+
+  <h2>Add Ingredients</h2>
+  <div class="form-wrapper">
+    <form class="item" action="" method="post">
+      {%csrf_token%}
+      {{formset.ingredients.management_form}}
+      {% for form in formset.ingredients%}
+      <ul class="no-marker">
+        <li class="item-add-list">
+        {% for hidden in form.hidden_fields%}
+          {{ hidden }}
+        {% endfor %}
+        {% for field in form.visible_fields %}
+          {{ field }}
+        {% endfor %}
+          <input name='action' value='ingredients' type="submit" style="visibility: hidden" >
+        </li>
+      </ul>
+        {{form.errors}}
+      {% endfor %}
+    </form>
+    </div>
+      {{formset.ingredients.non_form_errors}}
+
+  <h2>Add Instructions</h2>
+  <div class="form-wrapper">
+    <form class="item" action="" method="post">
+      {% csrf_token %}
+      {{formset.directions.management_form}}
+      {% for form in formset.directions%}
+      <ul class="no-marker">
+        <li class="item-add-list">
+        {% for hidden in form.hidden_fields%}
+          {{ hidden }}
+        {% endfor %}
+        {% for field in form.visible_fields %}
+          {{ field }}
+        {% endfor %}
+          <input name='action' value='directions' type="submit" style="visibility: hidden" >
+        </li>
+      </ul>
+        {{form.errors}}
+      {% endfor %}
+    </form>
+    </div>
+      {{formset.directions.non_form_errors}}
+
+
+
+{% endblock %}
+

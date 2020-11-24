@@ -34,3 +34,8 @@ def get_name_with_flag(string, flag=None):
 def get_id_with_flag(string, flag=None):
     return re.findall(r"-(\d*)-", string)[0]
 
+
+# Returns clean name
+def clean_string(name):
+    return name.rstrip().capitalize()
+

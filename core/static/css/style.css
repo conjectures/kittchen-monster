@@ -4,7 +4,7 @@
 }
 
 .form-wrapper {
-    display: flex;
+    /*display: flex;*/
     max-width: 100%;
     margin: 0 auto;
     text-align: center;
@@ -28,8 +28,8 @@
 
 li.item-add-list {
      display: flex;
-     margin-top: 1em;
-     margin-bottom: 1em;
+     margin-top: 0.2em;
+     margin-bottom: 0.2em;
  }
  ul.errorlist {
     list-style-type: none;
