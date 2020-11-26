@@ -39,3 +39,10 @@ def get_id_with_flag(string, flag=None):
 def clean_string(name):
     return name.rstrip().capitalize()
 
+
+# Reassign objects based on integer key
+def move_to_next_if_exists(dli, key, obj):
+    prevobj = dli.get(key)
+    if prevobj:
+        move_to_next_if_exists(dli, key+1, prevobj)
+    dli.update({key: obj})

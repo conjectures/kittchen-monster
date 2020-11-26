@@ -70,7 +70,7 @@ class IngredientTable(models.Model):
 
 class Direction(models.Model):
     recipe = models.ForeignKey(Post, related_name='directions', on_delete=models.CASCADE)
-    position = models.IntegerField()
+    position = models.IntegerField(blank=True)
     body = models.CharField(max_length=100)
 
     def __str__(self):

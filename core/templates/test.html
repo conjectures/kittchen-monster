@@ -36,15 +36,19 @@
       {% csrf_token %}
       {{formset.directions.management_form}}
       {% for form in formset.directions%}
-      <ul class="no-marker">
+      <ul class="no-marker" id="directions-list">
         <li class="item-add-list">
         {% for hidden in form.hidden_fields%}
           {{ hidden }}
         {% endfor %}
-        {% for field in form.visible_fields %}
-          {{ field }}
-        {% endfor %}
-          <input name='action' value='directions' type="submit" style="visibility: hidden" >
+        {% if form.instance.position is not None %}
+          <p>{{form.instance.position}}.</p>
+          {{ form.position.as_hidden }}
+        {% else %}
+        {{ form.position }}
+        {% endif %}
+        {{ form.body }}
+        <button name='action' value='directions' type="submit" class="btn btn-outline-secondary">&#x2713;</button>
         </li>
       </ul>
         {{form.errors}}
@@ -53,7 +57,22 @@
     </div>
       {{formset.directions.non_form_errors}}
 
+      <h2>Add Images</h2>
+
 
 
 {% endblock %}
 
+{% block scripts %}
+<script>
+  // var x = document.getElementById("directions-list").lastChild.innerHTML;
+//  function submitOnEnter(event){
+//    if(event.which === 13 && !event.shiftKey){
+//      event.target.form.dispatchEvent(new Event("submit", {cancelable: true}));
+//      event.preventDefault();
+//    }
+//  }
+  //document.querySelectorAll('[id^=id_directions-\d+-body]').addEventListener("keypress", alert('Hello'));
+  document.getElementById("id_directions-1-body").addEventListener("keypress", submitOnEnter)
+</script>
+{% endblock%}

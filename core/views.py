@@ -228,12 +228,17 @@ class testView(SingleObjectMixin, FormView):
             'ingredients': PostIngredientTableFormset,
             'directions': PostDirectionFormset,
             }
+    form_models = {
+            'ingredients': IngredientTable,
+            'directions': Direction,
+            }
     # instanciate form - self.object is recipe post
 
     @debug
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         formset = self.get_forms()
+        self.get_form_models()
         return render(request, self.template_name, context={'formset': formset, 'recipe': self.object})
 
     @debug
@@ -250,11 +255,12 @@ class testView(SingleObjectMixin, FormView):
             formset = self.get_forms(request=(request.POST or None), form_names=[action])[action]
             print("Action was in ")
             if formset.is_valid():
+                print("Form valid finished")
                 # checking formset validity also checks individual form validity
                 for form in formset:
                     if form.has_changed():
-                        # if direction, save order as position
                         form.save()
+
                 formset.save()
                 return render(request, self.template_name, context={'formset': self.get_forms(), 'recipe': self.object})
 
@@ -299,6 +305,12 @@ class testView(SingleObjectMixin, FormView):
         # Find individual or group submit
         # if form_name in forms.keys():
     # Used to return prefixes of each formset
+    def get_form_models(self, keys=None):
+        if not keys:
+            keys = [*self.form_models]
+        print(f"MODEL KEYS: {keys}")
+        return [self.form_models[x] for x in keys]
+
     def get_form_prefixes(self):
         return [*self.form_names]
 
