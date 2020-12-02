@@ -1,0 +1,124 @@
+
+{% extends "base.html" %}
+
+{% block head_title %}Creating Recipe{% endblock %}
+{% block body_title %}Creating{% endblock %}
+
+{% block content %}
+  <form class="recipe" action="" method="post">
+    {%csrf_token%}
+    {{formset.recipe.title}}
+    <input name='action' value='recipe' type="submit" style="visibility: hidden" >
+  </form>
+  <p>Author: {{ user.get_username }}</p>
+
+  <h2>Ingredients</h2>
+  <div class="form-wrapper">
+    <form class="ingredients" action="" method="post">
+      {%csrf_token%}
+      {{formset.ingredients.management_form}}
+      <ul class="no-marker">
+      {% for form in formset.ingredients%}
+        <li class="item-add-list">
+          <div class="input-fields">
+            {% for hidden in form.hidden_fields%}
+              {{ hidden }}
+            {% endfor %}
+            {% for field in form.visible_fields %}
+              {{ field }}
+            {% endfor %}
+            <input name='action' value='ingredients' type="submit" style="visibility: hidden" >
+          </div>
+          <div class="button-fields">
+            <button name='action' value={{form.prefix}} type="submit" class="btn btn-outline-secondary">&#x2713;</button>
+          </div>
+        </li>
+        {{form.errors}}
+      {% endfor %}
+      </ul>
+    </form>
+    </div>
+      {{formset.ingredients.non_form_errors}}
+
+  <h2>Instructions</h2>
+  <div class="form-wrapper">
+    <form class="directions" action="" method="post">
+      {% csrf_token %}
+      {{formset.directions.management_form}}
+      <ul class="no-marker" id="directions-list">
+      {% for form in formset.directions%}
+        <li class="item-add-list">
+          <div class="input-fields">
+            {% for hidden in form.hidden_fields%}
+              {{ hidden }}
+            {% endfor %}
+            {% if form.instance.position is not None %}
+              <p>{{form.instance.position}}.</p>
+              {{ form.position.as_hidden }}
+            {% else %}
+            {{ form.position }}
+            {% endif %}
+            {{ form.body }}
+          </div>
+          <div class="button-fields">
+            <button name='action' value='directions' type="submit" class="btn btn-outline-secondary">&#x2713;</button>
+          </div>
+        </li>
+        {{form.errors}}
+      {% endfor %}
+      </ul>
+    </form>
+    </div>
+      {{formset.directions.non_form_errors}}
+
+    <h2>Images</h2>
+<form class="images" action="" method="post" enctype="multipart/form-data">
+    {%csrf_token%}
+      {{formset.images.management_form}}
+      <ul class="no-marker" >
+      {% for form in formset.images%}
+        <li class="item-add-list">
+          <div class="input-fields">
+            {% for hidden in form.hidden_fields%}
+              {{ hidden }}
+            {% endfor %}
+            {% if form.instance.id is None %}
+              {{ form.image }}
+              </div>
+              <div class="button-fields">
+                <button name='action' value='{{form.prefix}}' type="submit" class="btn btn-outline-secondary">&#x2713;</button>
+              </div>
+            {% else %}
+              {{ form.image }}
+              </div>
+              <div class="button-fields">
+                <button name='action' value='{{form.prefix}}-DELETE' type="" class="btn btn-outline-danger">&times;</button>
+              </div>
+            {% endif %}
+        </li>
+        <p>{{form.errors}}</p>
+      {% endfor %}
+      </ul>
+      {{ formset.images.non_form_errors }}
+
+  </br>
+  <button name='action' value='done' type="submit" class="btn btn-outline-primary">Done</button>
+  <button name='action' value='delete' type="submit" class="btn btn-outline-danger">Remove</button>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+// var x = document.getElementById("directions-list").lastChild.innerHTML;
+//  function submitOnEnter(event){
+//    if(event.which === 13 && !event.shiftKey){
+//      event.target.form.dispatchEvent(new Event("submit", {cancelable: true}));
+//      event.preventDefault();
+//    }
+//  }
+  //document.querySelectorAll('[id^=id_directions-\d+-body]').addEventListener("keypress", alert('Hello'));
+// document.getElementById("id_directions-1-body").addEventListener("keypress", submitOnEnter)
+</script>
+{% endblock%}

@@ -21,15 +21,16 @@
 .no-marker {
     padding: 0;
     list-style-type: none;
-    display: table;
+    display:table;
     flex-wrap: wrap;
     width: 100%;
 }
 
 li.item-add-list {
-     display: flex;
+     display: table-row;
      margin-top: 0.2em;
      margin-bottom: 0.2em;
+     width: 100%;
  }
  ul.errorlist {
     list-style-type: none;
@@ -37,8 +38,97 @@ li.item-add-list {
      margin-bottom: 0;
  }
 
-form.ingredients{
-     display: flex;
-     max-width: 100%
+form.ingredients{ 
+    display: flex;
+    max-width: 100%
+}
+
+.input-fields {
+    display: inline-flex;
+    max-width: 94%;
+    min-width: 90%;
+}
+.button-fields {
+    display: table-cell;
+    min-width: 5%;
+    height: 100%;
+    text-align: center;
+    margin: auto;
+}
+
+.latest-recipes-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.header-image { 
+    max-width: 100%;
+    object-fit: cover;
+    align-self: center;
+
+
+    /*object-fit: contain;*/
+}
+
+.header-image-container { 
+    display: flex;
+    align-items: center;
+    max-width:80%;
+    height:auto;
+    overflow: hidden;
+    margin: 0px auto; /* center in middle of page */
+}
+
+.widget-image {
+    flex: 3;
+     padding-bottom: 15%;
+     background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1));
+     background-repeat: no-repeat;
+     background-position: center;
+     background-size: cover;
+}
+.widget-title {
+    flex: 1;
+    min-width:  10%;
+    background: #252525;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: calc(0.3rem + 1.2vw);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+}
+
+li > a:hover{
+    color: green;
+    text-decoration-color: white;
+}
+
+li.latest-recipes-list {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.footer-container {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background-color: #252525;
+    color: white;
+    padding: 0.5em;
+    height: 5vh;
+}
+
+ .container {
+     margin-bottom: 2vw;
+     height: auto;
+     min-height: 95vh;
  }
+
+
 

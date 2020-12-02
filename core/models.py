@@ -10,7 +10,7 @@ class Post(models.Model):
     title = models.CharField(max_length=100, unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # delete blogs of deleted user
     ingredients = models.ManyToManyField('Ingredient', through='IngredientTable', help_text='Input ingredients', blank=True)
-    body = models.TextField(max_length=1000, help_text='Recipe body')
+    # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
     posted_at = models.DateField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
 
@@ -77,5 +77,16 @@ class Direction(models.Model):
         return f"Direction {self.position} for {self.recipe.title}: {self.body}"
 
 
+class Image(models.Model):
+    recipe = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(null=True, blank=True, upload_to="images/")
+
+
+class TestModel(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    image = models.ImageField(null=True, blank=True, upload_to="images/")
+
+    def __str__(self):
+        return self.name
 
 

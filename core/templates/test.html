@@ -1,78 +1,15 @@
-
 {% extends "base.html" %}
 
-{% block title %}<title> Add Recipe</title>{% endblock%}
+{% block head_title %}Kittchen Monster Home{% endblock %}
+{% block body_title %}TEST{% endblock %}
 
 {% block content %}
-  <h1>Add recipe:{{recipe.title}}</h1>
-  <p>Author: {{ user.get_username }}</p>
 
-  <h2>Add Ingredients</h2>
-  <div class="form-wrapper">
-    <form class="item" action="" method="post">
-      {%csrf_token%}
-      {{formset.ingredients.management_form}}
-      {% for form in formset.ingredients%}
-      <ul class="no-marker">
-        <li class="item-add-list">
-        {% for hidden in form.hidden_fields%}
-          {{ hidden }}
-        {% endfor %}
-        {% for field in form.visible_fields %}
-          {{ field }}
-        {% endfor %}
-          <input name='action' value='ingredients' type="submit" style="visibility: hidden" >
-        </li>
-      </ul>
-        {{form.errors}}
-      {% endfor %}
-    </form>
-    </div>
-      {{formset.ingredients.non_form_errors}}
+<form class="form" action="" method="post", enctype="multipart/form-data">
+  {%csrf_token%}
+  {{form.as_p}}
+  {{form.errors}}
+  <input name='form' value='Submit' type="submit" >
 
-  <h2>Add Instructions</h2>
-  <div class="form-wrapper">
-    <form class="item" action="" method="post">
-      {% csrf_token %}
-      {{formset.directions.management_form}}
-      {% for form in formset.directions%}
-      <ul class="no-marker" id="directions-list">
-        <li class="item-add-list">
-        {% for hidden in form.hidden_fields%}
-          {{ hidden }}
-        {% endfor %}
-        {% if form.instance.position is not None %}
-          <p>{{form.instance.position}}.</p>
-          {{ form.position.as_hidden }}
-        {% else %}
-        {{ form.position }}
-        {% endif %}
-        {{ form.body }}
-        <button name='action' value='directions' type="submit" class="btn btn-outline-secondary">&#x2713;</button>
-        </li>
-      </ul>
-        {{form.errors}}
-      {% endfor %}
-    </form>
-    </div>
-      {{formset.directions.non_form_errors}}
-
-      <h2>Add Images</h2>
-
-
-
+</form>
 {% endblock %}
-
-{% block scripts %}
-<script>
-  // var x = document.getElementById("directions-list").lastChild.innerHTML;
-//  function submitOnEnter(event){
-//    if(event.which === 13 && !event.shiftKey){
-//      event.target.form.dispatchEvent(new Event("submit", {cancelable: true}));
-//      event.preventDefault();
-//    }
-//  }
-  //document.querySelectorAll('[id^=id_directions-\d+-body]').addEventListener("keypress", alert('Hello'));
-  document.getElementById("id_directions-1-body").addEventListener("keypress", submitOnEnter)
-</script>
-{% endblock%}

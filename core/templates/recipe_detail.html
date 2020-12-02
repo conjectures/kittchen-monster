@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}<title>Kittchen Monster Recipes</title>{% endblock %}
+{% block head_title %}Kittchen Monster Recipes{% endblock %}
+{% block body_title %}{{post.title}}{% endblock %}
 
 {% block content %}
-<h1>{{post.title}} </h1>
 
-{#}{% if user.is_authenticated %}{#}
 {% if user.is_authenticated %}
   {% if user.id == post.author.id or user.is_staff %}
   <a href="{% url 'recipe_edit' post.id %}">(Edit)</a>
@@ -13,9 +12,12 @@
 {% endif %}
 
 <p><strong>by {{ post.author }}</strong></p>
-<p>Date posted: {{post.posted_at}}</p>
-<p>Last edited: {{post.last_edited}}</p>
-<p>{{ post.body }}</p>
+<p><small><em>Posted: {{post.posted_at}}</em></small></p>
+<p><small><em>Edited: {{post.last_edited}}</em></small></p>
+  <div class="header-image-container">
+    <img src="{{post.images.first.image.url}}" class="header-image">
+  </div>
+
 <h2>Ingredients</h2>
 <ul>
 {%for ing in post.ingredienttable_set.all %}
@@ -34,3 +36,9 @@
 
 
 {% endblock %}
+
+<!--
+{% for img in post.images.all %}
+  <img src="{{img.image.url}}">
+{% endfor %}
+-->

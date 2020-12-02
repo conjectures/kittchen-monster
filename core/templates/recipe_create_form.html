@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}<title> Add Recipe</title>{% endblock%}
+{% block head_title %}Create Recipe{% endblock%}
+{% block body_title %}Create Recipe {% endblock %}
 
 {% block content %}
-<h2>Add Recipe</h2>
 <p>Author: {{ user.get_username }}</p>
 <form action="" method="post">
   {% for hidden_field in form.hidden_fields %}
@@ -13,11 +13,9 @@
   {% csrf_token %}
 
   {{ form.non_form_errors }}
-  <table>
-    {{ form.as_table }}
-  </table>
-  <p>
-  <input type="submit" value="Add recipe">
+  {{ form.title}}
+  </br>
+  <input type="submit" value="Create recipe", class="btn btn-outline-primary">
   &nbsp; &nbsp;
   <a href="{% url 'home' %}">Cancel</a>
   </p>

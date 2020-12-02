@@ -40,9 +40,29 @@ def clean_string(name):
     return name.rstrip().capitalize()
 
 
+# Return string split in dashes or underscores
+def parse_form_id(string):
+    return re.split('-|_', string)
+
+# def clean_form_id(string, pattern=None):
+#     pattern = "(\w+)(?=-)*" if pattern is None else pattern
+#     return re.match(pattern, string).group()
+
+
 # Reassign objects based on integer key
 def move_to_next_if_exists(dli, key, obj):
     prevobj = dli.get(key)
     if prevobj:
         move_to_next_if_exists(dli, key+1, prevobj)
     dli.update({key: obj})
+
+
+def is_formset(x):
+    return hasattr(x, 'management_form')
+
+
+def is_dictionary(x):
+    if type(x) is dict:
+        return True
+    else:
+        return False

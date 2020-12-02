@@ -5,7 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from .models import *
-from .utils.forms import is_empty_form, clean_string, move_to_next_if_exists
+from .utils.forms import is_empty_form, clean_string, move_to_next_if_exists, parse_form_id
 from django.forms.models import BaseInlineFormSet, inlineformset_factory, modelformset_factory
 
 
@@ -39,15 +39,15 @@ class IngredientModelForm(forms.ModelForm):
 IngredientModelFormset = modelformset_factory(Ingredient, form=IngredientModelForm, fields=('name',))
 
 
-class AddPostModelForm(forms.ModelForm):
-
-    class Meta:
-        model = Post
-        fields = ['title', 'body']
-        widgets = {
-                'title': forms.TextInput(attrs={'class': 'form-control'}),
-                'body': forms.Textarea(attrs={'class': 'form-control'})
-                }
+# class AddPostModelForm(forms.ModelForm):
+# 
+#     class Meta:
+#         model = Post
+#         fields = ['title', 'body']
+#         widgets = {
+#                 'title': forms.TextInput(attrs={'class': 'form-control'}),
+#                 'body': forms.Textarea(attrs={'class': 'form-control'})
+#                 }
 
 
 #class AddPostIntermediateForm(forms.ModelForm):
@@ -61,18 +61,39 @@ class AddPostModelForm(forms.ModelForm):
 class PostModelForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title',)
+        fields = ('title', )
         widgets = {
-                'title': forms.TextInput(attrs={'class': 'form-control'})
+                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                # 'images': forms.FileInput(attrs={'multiple': True}),
                 }
 
     @debug
     def clean_title(self, *args, **kwargs):
-        title = self.cleaned_data.get("title")
-        if Post.objects.filter(title=title).exists():
+        title = clean_string(self.cleaned_data.get("title"))
+        try:
+            model_instance = Post.objects.get(title=title)
+        except type(self.instance).DoesNotExist:
+            return title
+        print(f"{model_instance.id=}")
+        print(f"{self.instance.id=}")
+        if model_instance.id != self.instance.id:
             raise ValidationError(_(f"The recipe name '{title}'' already exists"))
+        else:
+            return title
 
-        return title
+    @debug
+    def clean(self, *args, **kwargs):
+        super().clean(*args, **kwargs)
+
+    @debug
+    def is_valid(self, *args, **kwargs):
+        print("IN IS_VALID METHOD")
+        print(f"{self=}")
+        return super().is_valid(*args, **kwargs)
+
+    @debug
+    def full_clean(self, *args, **kwargs):
+        return super().full_clean(*args, **kwargs)
 
 
 # Overwrite of TextInput form field render
@@ -171,6 +192,9 @@ class IngredientTableFormset(BaseInlineFormSet):
     Base formset with ingredient and ingredietntable forms
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def _should_delete_form(self, form):
         """
         Return whether the form should be deleted
@@ -225,9 +249,11 @@ class DirectionForm(forms.ModelForm):
 
 
 class DirectionFormset(BaseInlineFormSet):
-    """
-    Base formset for direction forms
-    """
+    """ Base formset for direction forms """
+
+    @debug
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def __iter__(self):
         """ Custom iterating method to overwrite formset display order """
@@ -307,6 +333,79 @@ class DirectionFormset(BaseInlineFormSet):
         return False
 
 
+class ImageField(forms.ClearableFileInput):
+    clear_checkbox_label = _('')
+    initial_text = _('')
+    input_text = _('')
+    template_name = 'widgets/image_input_clearable.html'
+
+
+class ImageForm(forms.ModelForm):
+    image = forms.ImageField(
+            label=_('Image'),
+            required=False,
+            error_messages={'invalid': ("Image files only")},
+            widget=ImageField,
+            )
+
+    class Meta:
+        model = Image
+        fields = ('image', )
+
+        @debug
+        def clean_image(self, *args, **kwargs):
+            super().clean_image(*args, **kwargs)
+
+
+class ImageFormset(BaseInlineFormSet):
+    """ Base formset for adding images """
+
+    @debug
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # print()
+        # print("FLAG~~~~~~")
+        # print(f"{self.data=}")
+        # print(f"{self.files=}")
+        # print(f"{self.initial=}")
+        # print(f"{self.form_kwargs=}")
+
+    @debug
+    def is_valid(self, *args, **kwargs):
+        return super().is_valid(*args, **kwargs)
+
+    def clean(self, *args, **kwargs):
+        # check if any form should be deleted:
+        print("IN CLEAN METHOD")
+        for form in self.forms:
+            if self._should_delete_form(form):
+                print("FORM SHOULD BE DELETED")
+        super().clean(*args, **kwargs)
+
+    @debug
+    def _should_delete_form(self, form):
+        """ Check if DELETE button was pressed """
+        if form.cleaned_data.get(forms.formsets.DELETION_FIELD_NAME):
+            return True
+        action = parse_form_id(self.data.get('action'))
+
+        # get form id
+        print("FLAG ~~~~~~~")
+        print(f"{action=}")
+        print(f"{self.data=}")
+        print(f"{form=}")
+        print(f"{form.cleaned_data=}")
+        print(f"{form.prefix=}")
+        print()
+        if 'DELETE' in action:
+            # Get current form id:
+            form_id = parse_form_id(form.prefix)[1]
+            # If action id matches current form id form should be deleted
+            if form_id == action[1]:
+                return True
+        return False
+
+
 PostIngredientTableFormset = inlineformset_factory(
         Post,
         IngredientTable,
@@ -327,6 +426,33 @@ PostDirectionFormset = inlineformset_factory(
         can_delete=False,
         # can_order=True,
         )
+
+PostImageFormset = inlineformset_factory(
+        Post,
+        Image,
+        fields=('image',),
+        formset=ImageFormset,
+        form=ImageForm,
+        extra=1,
+        # can_delete=True,
+        )
+
+
+class TestForm(forms.ModelForm):
+
+    class Meta:
+        model = TestModel
+        fields = 'name', 'image'
+        # widgets = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        print()
+        print("FLAG~~~~~~")
+        print(f"{self.data=}")
+        print(f"{self.files=}")
+        print(f"{self.initial=}")
+
 
 # class BaseRecipeWithIngredientTableFormset(BaseInlineFormSet):
 #     """
