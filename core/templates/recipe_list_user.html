@@ -5,10 +5,10 @@
 {% block content %}
   <h1>{{ user.get_username }} Recipes</h1>
   {% if post_list %}
-  <ul>
+  <ul class="no-marker">
     {% for recipe in post_list %}
     <li>
-      <a href="{{recipe.get_absolute_url}}"> {{recipe.title}}</a>
+      <a href="{{recipe.get_absolute_url}}">{{recipe.title}}</a>
     </li>
 
   </ul>
