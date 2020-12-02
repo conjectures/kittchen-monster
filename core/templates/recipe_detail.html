@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block head_title %}Kittchen Monster Recipes{% endblock %}
+{% block body_title %}{{post.title}}{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+  {% if user.id == post.author.id or user.is_staff %}
+  <a href="{% url 'recipe_edit' post.id %}">(Edit)</a>
+  {% endif %}
+{% endif %}
+
+<p><strong>by {{ post.author }}</strong></p>
+<p><small><em>Posted: {{post.posted_at}}</em></small></p>
+<p><small><em>Edited: {{post.last_edited}}</em></small></p>
+  <div class="header-image-container">
+    <img src="{{post.images.first.image.url}}" class="header-image">
+  </div>
+
+<h2>Ingredients</h2>
+<ul>
+{%for ing in post.ingredienttable_set.all %}
+<p>{{ing.quantity}} {{ing.unit}} {{ing.ingredient}}</p>
+{% endfor %}
+</ul>
+
+<h2>Method</h2>
+<ul>
+{%for direction in post.directions.all %}
+<p>{{direction.position}}. {{direction.body}}</p>
+{% endfor %}
+</ul>
+
+
+
+
+{% endblock %}
+
+<!--
+{% for img in post.images.all %}
+  <img src="{{img.image.url}}">
+{% endfor %}
+-->

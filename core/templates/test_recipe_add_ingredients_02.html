@@ -1,0 +1,71 @@
+
+{% extends "base.html" %}
+
+{% block title %}<title> Add Recipe</title>{% endblock%}
+
+{% block content %}
+<h1>Add recipe:{{post.title}}</h1>
+<p>Author: {{ user.get_username }}</p>
+<form action="" method="post">
+  {% for hidden_field in form.hidden_fields %}
+    {{ hidden_field.errors }}
+    {{ hidden_field }}
+  {% endfor %}
+  {% csrf_token %}
+
+  {{ form.management_form }}
+  {{ form.non_form_errors }}
+
+  <h2>
+  {% for ingredient_form in form.forms %}
+    {% if ingredient_form.instance.id %}
+    Ingredient: {{ ingredient.instance.id }}</h2>
+    {% else %}
+    {% if formm.forms|length > 1%}
+      Add another book
+      {% else %}
+        Add Ingredient
+      {% endif %}
+    {% endif %}
+    </h2>
+
+    {% for hidden_field in ingredient_form.hidden_fields %}
+      {{ hidden_field.errors }}
+    {% endfor %}
+
+    <table>
+      {{ ingredient_form.as_table }}
+    </table>
+
+    {% if ingredient_form.nested %}
+      <div class="indent">
+        <h3>Other</h3>
+        {{ ingredient_form.nested.management_form }}
+        {{ ingredient_form.nested.non_form_errors }}
+
+        <table>
+          {% for item in ingredient_form.nested.forms %}
+            {% if item.instance.id %}
+            <p>item</p>
+            {% else %}
+            <p>Add an item</p>
+            {% endif %}
+            {% for hidden_field in item.hidden_fields %}
+              {{ hidden_field.errors }}
+            {% endfor %}
+            <table>
+              {{ item.as_table }}
+            </table>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+    {% endfor %}
+
+
+  <input type="submit" value="Add recipe">
+  &nbsp; &nbsp;
+  <a href="{% url 'home' %}">Cancel</a>
+  </p>
+</form>
+{% endblock %}

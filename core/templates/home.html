@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block head_title %}Kittchen Monster Home{% endblock %}
+{% block body_title %}Home{% endblock %}
+
+{% block content %}
+
+<h2>Latest Recipes</h1>
+<ul class="no-marker">
+    {% for blog in recipe_list%}
+      <li class="latest-recipes-list">
+        <a href="{{blog.get_absolute_url}}" class="latest-recipes-item">
+          <div class="widget-image"
+            style="background-image:
+              linear-gradient(to right, rgba(37,37,37,0) 30%, rgba(37,37,37,0.3) 60%, rgba(37,37,37,1)),
+              url({{blog.images.first.image.url}});
+              "></div>
+
+          <div class="widget-title">{{blog.title}}</div>
+        </a>
+      </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block head_title %}Kittchen Monster Home{% endblock %}
+{% block body_title %}TEST{% endblock %}
+
+{% block content %}
+
+<form class="form" action="" method="post", enctype="multipart/form-data">
+  {%csrf_token%}
+  {{form.as_p}}
+  {{form.errors}}
+  <input name='form' value='Submit' type="submit" >
+
+</form>
+{% endblock %}

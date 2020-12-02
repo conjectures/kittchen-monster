@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block head_title %}Create Recipe{% endblock%}
+{% block body_title %}Create Recipe {% endblock %}
+
+{% block content %}
+<p>Author: {{ user.get_username }}</p>
+<form action="" method="post">
+  {% for hidden_field in form.hidden_fields %}
+    {{ hidden_field.errors }}
+    {{ hidden_field }}
+  {% endfor %}
+  {% csrf_token %}
+
+  {{ form.non_form_errors }}
+  {{ form.title}}
+  </br>
+  <input type="submit" value="Create recipe", class="btn btn-outline-primary">
+  &nbsp; &nbsp;
+  <a href="{% url 'home' %}">Cancel</a>
+  </p>
+</form>
+{% endblock %}
