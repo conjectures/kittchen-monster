@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}<title>Kittchen Monster User Recipes</title>{% endblock %}
+{% block head_title %}<title>Kittchen Monster User Recipes</title>{% endblock %}
+{% block body_title %}{{user.get_username}} Recipes{% endblock %}
 
 {% block content %}
-  <h1>{{ user.get_username }} Recipes</h1>
+</br>
   {% if post_list %}
-  <ul class="no-marker">
+  <div class="widget-container">
     {% for recipe in post_list %}
-    <li>
-      <a href="{{recipe.get_absolute_url}}">{{recipe.title}}</a>
-    </li>
-
-  </ul>
+    <a href="{{recipe.get_absolute_url}}">
+      <div
+        class="widget-image-square"
+        style="background-image:
+              linear-gradient(to bottom, rgba(37,37,37,0) 30%, rgba(37,37,37,0.3) 60%, rgba(37,37,37,1)),
+              url({{recipe.images.first.image.url}});">
+        {{recipe.title}}
+      </div>
+    </a>
     {% endfor %}
+  </div>
   {% else %}
     <p>No recipes submitted</p>
   {% endif %}
