@@ -56,19 +56,10 @@ form.ingredients{
     margin: auto;
 }
 
-.latest-recipes-item {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
-
 .header-image { 
     max-width: 100%;
     object-fit: cover;
     align-self: center;
-
-
-    /*object-fit: contain;*/
 }
 
 .header-image-container { 
@@ -78,6 +69,12 @@ form.ingredients{
     height:auto;
     overflow: hidden;
     margin: 0px auto; /* center in middle of page */
+}
+
+.latest-recipes-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
 }
 
 .widget-image {
@@ -101,12 +98,11 @@ form.ingredients{
     align-items: center;
 
 }
-
+div > a:hover,
 li > a:hover{
-    color: green;
+    color: white;
     text-decoration-color: white;
 }
-
 li.latest-recipes-list {
     margin-top: 1em;
     margin-bottom: 1em;
@@ -124,11 +120,32 @@ li.latest-recipes-list {
     height: 5vh;
 }
 
- .container {
-     margin-bottom: 2vw;
-     height: auto;
-     min-height: 95vh;
- }
+.container {
+    margin-bottom: 2vw;
+    height: auto;
+    min-height: 95vh;
+}
+.widget-image-square {
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1));
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    min-width: 15vw;
+    height: 15vw;
+    display: flex;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: calc(0.3rem + 1.2vw);
+
+}
+.widget-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 15vw);
+    grid-gap: 5px;
+    width: 100%;
+}
 
 
 
