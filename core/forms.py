@@ -39,61 +39,47 @@ class IngredientModelForm(forms.ModelForm):
 IngredientModelFormset = modelformset_factory(Ingredient, form=IngredientModelForm, fields=('name',))
 
 
-# class AddPostModelForm(forms.ModelForm):
-# 
-#     class Meta:
-#         model = Post
-#         fields = ['title', 'body']
-#         widgets = {
-#                 'title': forms.TextInput(attrs={'class': 'form-control'}),
-#                 'body': forms.Textarea(attrs={'class': 'form-control'})
-#                 }
+class CategoryModelForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ('name',)
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control'}),
+                }
 
-
-#class AddPostIntermediateForm(forms.ModelForm):
-#    custom = forms.ModelChoiceField(queryset=Direction.objects.all(), empty_label="Custom Field")
-#
-#    class Meta:
-#        model = Post
-#        fields = ['title', 'ingredients', 'body', 'custom']
+    @debug
+    def clean_name(self, *args, **kwargs):
+        name = clean_string(self.cleaned_data.get('name'))
+        try:
+            model_instance = Category.objects.get(name=name)
+            print(f"MODEL INSTANCE {model_instance}")
+        except type(self.instance).DoesNotExist:
+            return name
+        if model_instance.id != self.instance.id:
+            raise ValidationError(_(f"The recipe name '{name}' already exists"))
+        else:
+            return name
 
 
 class PostModelForm(forms.ModelForm):
+    "Model form for Recipes"
     class Meta:
         model = Post
         fields = ('title', )
         widgets = {
                 'title': forms.TextInput(attrs={'class': 'form-control'}),
-                # 'images': forms.FileInput(attrs={'multiple': True}),
                 }
 
-    @debug
     def clean_title(self, *args, **kwargs):
         title = clean_string(self.cleaned_data.get("title"))
         try:
             model_instance = Post.objects.get(title=title)
         except type(self.instance).DoesNotExist:
             return title
-        print(f"{model_instance.id=}")
-        print(f"{self.instance.id=}")
         if model_instance.id != self.instance.id:
             raise ValidationError(_(f"The recipe name '{title}'' already exists"))
         else:
             return title
-
-    @debug
-    def clean(self, *args, **kwargs):
-        super().clean(*args, **kwargs)
-
-    @debug
-    def is_valid(self, *args, **kwargs):
-        print("IN IS_VALID METHOD")
-        print(f"{self=}")
-        return super().is_valid(*args, **kwargs)
-
-    @debug
-    def full_clean(self, *args, **kwargs):
-        return super().full_clean(*args, **kwargs)
 
 
 # Overwrite of TextInput form field render
@@ -182,10 +168,6 @@ class IngredientTableForm(forms.ModelForm):
         ingredient.name = clean_string(ingredient.name)
         return ingredient
 
-    def is_valid(self, *args, **kwargs):
-        print("IN INGREDIENTTABLEMODELFORM IS VALID METHOD")
-        return super().is_valid(*args, **kwargs)
-
 
 class IngredientTableFormset(BaseInlineFormSet):
     """
@@ -219,10 +201,8 @@ class IngredientTableFormset(BaseInlineFormSet):
                 continue
             item = form.cleaned_data.get('ingredient')
             if item in items:
-                print(f"{item} appears twice")
                 raise ValidationError(_("Ingredients must be different"))
             items.append(item)
-            print(items)
         # No need to check if there are errors
         # if any(self.errors):
         #     return
@@ -360,23 +340,8 @@ class ImageForm(forms.ModelForm):
 class ImageFormset(BaseInlineFormSet):
     """ Base formset for adding images """
 
-    @debug
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # print()
-        # print("FLAG~~~~~~")
-        # print(f"{self.data=}")
-        # print(f"{self.files=}")
-        # print(f"{self.initial=}")
-        # print(f"{self.form_kwargs=}")
-
-    @debug
-    def is_valid(self, *args, **kwargs):
-        return super().is_valid(*args, **kwargs)
-
     def clean(self, *args, **kwargs):
         # check if any form should be deleted:
-        print("IN CLEAN METHOD")
         for form in self.forms:
             if self._should_delete_form(form):
                 print("FORM SHOULD BE DELETED")
@@ -389,14 +354,6 @@ class ImageFormset(BaseInlineFormSet):
             return True
         action = parse_form_id(self.data.get('action'))
 
-        # get form id
-        print("FLAG ~~~~~~~")
-        print(f"{action=}")
-        print(f"{self.data=}")
-        print(f"{form=}")
-        print(f"{form.cleaned_data=}")
-        print(f"{form.prefix=}")
-        print()
         if 'DELETE' in action:
             # Get current form id:
             form_id = parse_form_id(form.prefix)[1]
@@ -437,88 +394,3 @@ PostImageFormset = inlineformset_factory(
         # can_delete=True,
         )
 
-
-class TestForm(forms.ModelForm):
-
-    class Meta:
-        model = TestModel
-        fields = 'name', 'image'
-        # widgets = {}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        print()
-        print("FLAG~~~~~~")
-        print(f"{self.data=}")
-        print(f"{self.files=}")
-        print(f"{self.initial=}")
-
-
-# class BaseRecipeWithIngredientTableFormset(BaseInlineFormSet):
-#     """
-#     Base formset for editing Ingredient Tables belonging to Recipes
-#     """
-# 
-#     def add_fields(self, form, index):
-#         super().add_fields(form, index)
-#         # save the formset for a book's images in the nested property
-#         form.nested = IngredientFormset(instance=form.instance,
-#                                         data=form.data if form.is_bound else None,
-#                                         files=form.files if form.is_bound else None,
-#                                         # add custom prefix
-#                                         prefix=f"ingredienttable-{form.prefix}-{IngredientFormset.get_default_prefix()}")
-# 
-#     def is_adding_nested_inlines_to_empty_form(self, form):
-#         """
-#         are data added in nested inline forms to a form without data?
-#         """
-#         if not hasattr(form, 'nested'):
-#             # form without children (leaf)
-#             return False
-#         if is_form_persisted(form):
-#             # Editing (and not adding) current form
-#             return False
-#         if not is_empty_form(form):
-#             # Form has errors or contains valid data
-#             return False
-#         # All inline forms that aren't being deleted:
-#         non_deleted_forms = set(form.nested.forms).difference(set(form.nested.deleted_forms))
-#         # If above checks failed, the form is empty. Return True if there is any data inside nested
-#         return any(not is_empty_form(nested_form) for nested_form in non_deleted_forms)
-# 
-#     def is_valid(self):
-#         """
-#         Also validate nested formsets
-#         """
-#         result = super().is_valid()
-#         if self.is_bound:
-#             for form in self.forms:
-#                 if hasattr(form, 'nested'):
-#                     result = result and form.nested.is_valid()
-#         return result
-# 
-#     def clean(self):
-#         """
-#         If a parent form has no data, but nedted forms do,
-#         an error should return because parent can't be saved.
-#         """
-#         super.clean()
-#         for form in self.forms:
-#             # check if it has child or is marked for deletion
-#             if not hasattr(form, 'nested') or self._should_delete_form(form):
-#                 continue
-#             if self._is_adding_nested_inlines_to_empty_form(form):
-#                 form.add_error(
-#                         field=None,
-#                         error=_('You are adding ingredients to a book that does not exist yet'))
-# 
-#     def save(self, commit=True):
-#         """
-#         Also save nested formsets
-#         """
-#         result = super.save(commit=commit)
-#         for form in self.forms:
-#             if hasattr(form, 'nested'):
-#                 if not self._should_delete_form(form):
-#                     form.nested.save(commit=commit)
-#         return result

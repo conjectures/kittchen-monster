@@ -3,6 +3,7 @@ from core.utils.debug import debug
 from core.utils.multiform import *
 from core.utils.forms import get_name_with_flag, get_id_with_flag, parse_form_id, is_formset, is_dictionary
 
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, FormView
 from .models import *
@@ -40,7 +41,7 @@ class RecipeByUserListView(LoginRequiredMixin, ListView):
         return Post.objects.filter(author=self.request.user)
 
 
-class RecipeCreateView(CreateView):
+class RecipeCreateView(LoginRequiredMixin, CreateView):
     """
     Add recipe title only
     """
@@ -48,19 +49,17 @@ class RecipeCreateView(CreateView):
     template_name = 'recipe_create_form.html'
     form_class = PostModelForm
 
-    @debug
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.author = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-    @debug
     def get_success_url(self):
         return reverse('recipe_add', kwargs={'pk': self.object.pk})
 
 
-class BaseRecipeAddView(SingleObjectMixin, FormView):
+class BaseRecipeAddView(LoginRequiredMixin, SingleObjectMixin, FormView):
     """ View combining all components needed to add recipe """
     model = Post
     template_name = 'recipe_add_form.html'
@@ -78,28 +77,17 @@ class BaseRecipeAddView(SingleObjectMixin, FormView):
             }
     # instanciate form - self.object is recipe post
 
-    @debug
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         formset = self.get_forms()
         self.get_form_models()
         return render(request, self.template_name, context={'formset': formset, 'recipe': self.object})
 
-    @debug
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         # formset = self.get_forms(request.POST or None,  instance=self.object)
         prefix = parse_form_id(request.POST.get('action'))
         action = prefix[0]
-        # TODO if return NOne
-        print(f"{action=}")
-        print()
-        # Get form that was submiteed
-        print()
-        print(f"{self.object=}")
-        print(f"{self.object.id=}")
-        print()
-        print()
         if action in self.get_form_prefixes():
             formset = self.get_forms(
                     request={
@@ -113,12 +101,7 @@ class BaseRecipeAddView(SingleObjectMixin, FormView):
             else:
                 return redirect(self.object)
 
-        print(f"{formset=}")
-        print(f"{type(formset)=}")
-        print()
-
         # check if formset
-        # if formset.is_valid():
         if self.validate_forms(formset):
             # Form or formset is valid.
             context = {'formset': self.get_forms(), 'recipe': self.object}
@@ -132,36 +115,12 @@ class BaseRecipeAddView(SingleObjectMixin, FormView):
                     }
 
         return render(request, self.template_name, context=context)
-#             # check if formset has nested forms
-#             if hasattr(formset, 'management_form'):
-#                 print("is formset")
-#                 # checking formset validity also checks individual form validity
-#                 for form in formset:
-#                     if form.has_changed():
-#                         form.save()
-# 
-#             formset.save()
-# 
-#         else:
-#             # if formset['action'].errors
-#             if hasattr(formset, 'management_form'):
-#                 for form in formset:
-#                     if form.has_changed() and formset._should_delete_form(form):
-#                         print("SHOULD DELETE FORM")
-#                         print(form.cleaned_data)
-#                         form.instance.delete()
-#                         formset = self.get_forms()
-#                         return render(request, self.template_name, context={'formset': formset, 'recipe': self.object})
-#             print("RENDER WITH ERROR")
-#             print(context)
-#             return render(request, self.template_name, context)
 
     def validate_forms(self, formset):
         # Check if dictionary
         if is_dictionary(formset):
             # validate each form / formset in dictionary
             for key, item in formset.items():
-                print(f"{key=}\n{item=}")
                 self.validate_forms(item)
             # TODO: check if return value necessary
             self.all_forms_valid()
@@ -182,7 +141,6 @@ class BaseRecipeAddView(SingleObjectMixin, FormView):
                     # check if form has been deleted
                     for form in formset:
                         if form.has_changed() and formset._should_delete_form(form):
-                            print("SHOULD DELETE FORM")
                             form.instance.delete()
                             return True
                 # If for loop exits or if not formset, return False to render with errors
@@ -195,7 +153,6 @@ class BaseRecipeAddView(SingleObjectMixin, FormView):
     def get_form_models(self, keys=None):
         if not keys:
             keys = [*self.form_models]
-        print(f"MODEL KEYS: {keys}")
         return [self.form_models[x] for x in keys]
 
     def get_form_prefixes(self):
@@ -208,31 +165,40 @@ class BaseRecipeAddView(SingleObjectMixin, FormView):
             form_names = [*self.form_names]
         return {x: self.form_names.get(x) for x in form_names}
 
-    @debug
     def get_forms(self, request=None, form_names=None):
         # forms = super().get_forms(form_classes)
         instance = self.get_object()
         dictionary = self.get_form_names(form_names)
-        print("GETTING FORMS:")
-        print(dictionary)
         if request:
             request_data = request.get('data')
             request_files = request.get('files')
-            print("WITH REQUEST")
-            # TODO: check if self.files (in forms) actually takes files
             context = {key: klass(data=request_data, files=request_files, instance=instance, prefix=key) for (key, klass) in dictionary.items()}
         else:
-            print("WITH NO REQUEST")
             context = {key: klass(instance=instance, prefix=key) for (key, klass) in dictionary.items()}
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Restrict permission to non staff and non author """
+        handler = super().dispatch(request, *args, **kwargs)
+        user = request.user
+        post = self.get_object()
+        if not (post.author == user or user.is_staff):
+            raise PermissionDenied
+        return handler
 
 
 class RecipeAddView(BaseRecipeAddView):
     template_name = 'recipe_add_form.html'
 
+#    def get_queryset(self):
+#        return super().filter(user=self.request.user)
+
 
 class RecipeUpdateView(BaseRecipeAddView):
-    template_name = 'recipe_add_form.html'
+    template_name = 'recipe_edit_form.html'
+
+#    def get_queryset(self):
+#        return super().filter(user=self.request.user)
 
 
 class RecipeDetailView(DetailView):
@@ -240,9 +206,64 @@ class RecipeDetailView(DetailView):
     template_name = 'recipe_detail.html'
 
 
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = 'category_list.html'
+    context_object_name = 'category_list'
+    ordering = ['name']
+
+
+class CategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Category
+    template_name = 'category_create_form.html'
+    form_class = CategoryModelForm
+
+    def get_success_url(self):
+        return reverse('category_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Restrict permission to non staff and non author """
+        handler = super().dispatch(request, *args, **kwargs)
+        user = request.user
+        if not user.is_staff:
+            raise PermissionDenied
+        return handler
+
+
+class CategoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Category
+    template_name = 'category_update_form.html'
+    form_class = CategoryModelForm
+
+    def get_success_url(self):
+        return reverse('category_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Restrict permission to non staff and non author """
+        handler = super().dispatch(request, *args, **kwargs)
+        user = request.user
+        if not user.is_staff:
+            raise PermissionDenied
+        return handler
+
+
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Category
+    success_url = reverse_lazy('category_list')
+    template_name = 'category_confirm_delete.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Restrict permission to non staff and non author """
+        handler = super().dispatch(request, *args, **kwargs)
+        user = request.user
+        if not user.is_staff:
+            raise PermissionDenied
+        return handler
+
+
 # class RecipeUpdateView(UpdateView):
 #     model = Post
-#     form_class = AddPostModelForm
+#     form_class = AddPostModelFormcac
 #     template_name = 'recipe_add_form.html'
 #     # empty dict to add initial data
 #     # initial = {}
@@ -260,12 +281,12 @@ class RecipeDetailView(DetailView):
 #        form.instance.save()
 #        return response
 
-class TestModelCreateView(CreateView):
-    model = TestModel
-    template_name = 'test.html'
-    # fields = '__all__'
-    success_url = reverse_lazy('home')
-    form_class = TestForm
+# class TestModelCreateView(CreateView):
+#     model = TestModel
+#     template_name = 'test.html'
+#     # fields = '__all__'
+#     success_url = reverse_lazy('home')
+#     form_class = TestForm
 
 
 

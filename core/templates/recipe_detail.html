@@ -13,7 +13,9 @@
 
 <p><strong>by {{ post.author }}</strong></p>
 <p><small><em>Posted: {{post.posted_at}}</em></small></p>
-<p><small><em>Edited: {{post.last_edited}}</em></small></p>
+{% if post.posted_at|date:"YmdHis" < post.last_edited|date:"YmdHis" %}
+  <p><small><em>Edited: {{post.last_edited}}</em></small></p>
+  {% endif%}
   <div class="header-image-container">
     <img src="{{post.images.first.image.url}}" class="header-image">
   </div>
@@ -32,6 +34,20 @@
 {% endfor %}
 </ul>
 <h2>Gallery</h2>
+<div class="widget-container">
+  {% for img in post.images.all %}
+    <a href="{{img.image.url}}">
+      <div
+        class="widget-image-square"
+        style="background-image:
+              linear-gradient(to bottom, rgba(37,37,37,0) 30%, rgba(37,37,37,0.3) 60%, rgba(37,37,37,1)),
+              url({{img.image.url}});">
+      </div>
+    </a>
+
+  {% endfor %}
+
+</div>
 
 {% endblock %}
 

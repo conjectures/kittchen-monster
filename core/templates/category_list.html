@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block head_title %}Category List{% endblock %}
+{% block body_title %}Categories{% endblock %}
+
+{% block content %}
+{% if user.is_staff %}
+<div class="button-fields">
+  <a href="{% url 'category_create'%}" class="btn btn-lg btn-link">&plus;</a>
+</div>
+{% endif %}
+{% if category_list %}
+  <ul class="no-marker">
+    {% for category in category_list %}
+        <li class="categories-list">
+          <div class="btn-group dropdown">
+            <button type"button" class="btn btn-outline-secondary">{{category.name}}</button>
+            {% if user.is_staff %}
+              <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'category_rename' category.id %}">Rename</a>
+                <a class="dropdown-item" href="{% url 'category_remove' category.id %}">Remove</a>
+              </div>
+            {% endif %}
+          </div>
+        </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No categories yet.</p>
+{% endif %}
+
+{% endblock %}

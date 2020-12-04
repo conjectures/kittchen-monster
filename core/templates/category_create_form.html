@@ -1,0 +1,28 @@
+
+{% extends "base.html" %}
+
+{% block head_title %}Create Category{% endblock %}
+{% block body_title %}Create Category{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+  {% csrf_token %}
+  {% for hidden_field in form.hidden_fields %}
+    {{ hidden_field.errors }}
+    {{ hidden_field }}
+  {% endfor %}
+  {{ form.name}}
+  {% for error in form.name.errors %}
+    <strong>{{error|escape}}</strong>
+  {% endfor %}
+
+  </br>
+  </br>
+  <input type="submit" value="Create", class="btn btn-outline-primary">
+  &nbsp; &nbsp;
+  <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+
+
+{% endblock %}

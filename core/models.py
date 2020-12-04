@@ -11,8 +11,9 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # delete blogs of deleted user
     ingredients = models.ManyToManyField('Ingredient', through='IngredientTable', help_text='Input ingredients', blank=True)
     # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
-    posted_at = models.DateField(auto_now_add=True)
+    posted_at = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
+    categories = models.ManyToManyField('Category', blank=True)
 
     def __str__(self):
         return f"{self.title} by {self.author}"
@@ -82,11 +83,17 @@ class Image(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to="images/")
 
 
-class TestModel(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    image = models.ImageField(null=True, blank=True, upload_to="images/")
+class Category(models.Model):
+    name = models.CharField(max_length=32)
 
     def __str__(self):
         return self.name
+
+# class TestModel(models.Model):
+#     name = models.CharField(max_length=50, unique=True)
+#     image = models.ImageField(null=True, blank=True, upload_to="images/")
+# 
+#     def __str__(self):
+#         return self.name
 
 

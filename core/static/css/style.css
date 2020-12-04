@@ -142,10 +142,12 @@ li.latest-recipes-list {
 .widget-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 15vw);
+    grid-template-rows: repeat(auto-fill, 15vw);
     grid-gap: 5px;
     width: 100%;
 }
 
-
+.categories-list {
+    margin-bottom: 0.5em;
+}
 

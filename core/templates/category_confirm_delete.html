@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Delete Recipe </h1>
+<h1>Delete Category</h1>
 <p>Are you sure you want to delete this recipe?</p>
-<p><strong>{{post.title}}</strong></p>
+<p><strong>{{category.name}}</strong></p>
+</br>
 <form action="" method="POST">
   {% csrf_token }%}
   <input class="btn btn-primary" type="submit" value="Yes">
