@@ -1,15 +1,138 @@
+
 {% extends "base.html" %}
 
-{% block head_title %}Kittchen Monster Home{% endblock %}
-{% block body_title %}TEST{% endblock %}
+{% block head_title %}Creating Recipe{% endblock %}
+{% block body_title %}Creating{% endblock %}
 
 {% block content %}
+  <p>Author: {{ user.get_username }}</p>
+  <strong>{{formset.recipe.title.errors}}</strong>
+  <form class="recipe" action="" method="post">
+    {%csrf_token%}
+    {{formset.recipe.title}}
+    <input name='action' value='recipe' type="submit" style="visibility: hidden" >
+  </form>
 
-<form class="form" action="" method="post", enctype="multipart/form-data">
-  {%csrf_token%}
-  {{form.as_p}}
-  {{form.errors}}
-  <input name='form' value='Submit' type="submit" >
+  <h2>Categories</h2>
+  <form class="categories" action="" method="post">
+    {% for hidden in formset.categories.name.hidden_fields %}
+      {{hidden}}
+    {% endfor %}
+    <strong>{{formset.categories.categories.errors}}</strong>
+    {%csrf_token%}
+    <div class="form-items-wrapper">
+    {{formset.categories.categories}}
+    <button name='action' value='categories' type="submit" class="btn btn-outline-secondary">Insert</button>
+    </div>
+    {% for tag in recipe.categories.all %}
+      <div>
+        <button name="action" value="categories-{{tag.id}}-REMOVE" type="submit" class="badge badge-primary pill-button">&times;</button>
+        {{tag.name}}
+      </div>
+    {% endfor %}
+  </form>
 
+
+
+  <h2>Ingredients</h2>
+    {% for field in formset.items %}
+      <strong>{{field.errors}}</strong>
+    {% endfor %}
+    <form class="items" action="" method="post">
+    <div class="form-items-wrapper">
+      {%csrf_token%}
+      {% for hidden in formset.items.hidden_fields %}
+        {{ hidden }}
+      {% endfor%}
+      {{formset.items.ingredient}}
+      {{formset.items.unit}}
+      {{formset.items.quantity}}
+      <button name='action' value='items' type="submit" class="btn btn-outline-secondary">Insert</button>
+    </div>
+    <div class="form-itmes-wrapper">
+      {% for tag in recipe.items.all %}
+        <div>
+          <button name="action" value="items-{{tag.id}}-REMOVE" type="submit" class="badge badge-pill badge-primary pill-button">&times;</button>
+          {{tag.quantity}} {{tag.unit}} of {{tag.ingredient}}
+        </div>
+      {% endfor %}
+      </div>
+    </form>
+
+
+
+  <h2>Instructions</h2>
+    {% for field in formset.directions %}
+      <strong>{{field.errors}}</strong>
+    {% endfor %}
+    <form class="directions" action="" method="post">
+      {% csrf_token %}
+      <div>
+        {% for hidden in formset.directions.hidden_fields %}
+          {{ hidden }}
+        {% endfor%}
+        {{formset.directions.position}}
+        {{formset.directions.body}}
+      <button name='action' value='directions' type="submit" class="btn btn-outline-secondary">Insert</button>
+    </div>
+    <div>
+      {% for tag in recipe.directions.all %}
+        <div>
+          <button name="action" value="directions-{{tag.id}}-REMOVE" type="submit" class="badge badge-pill badge-primary pill-button">&times;</button>
+          {{ forloop.counter }}. {{tag.body}}
+        </div>
+      {% endfor %}
+      </div>
+    </form>
+
+    <h2>Images</h2>
+<form class="images" action="" method="post" enctype="multipart/form-data">
+    {%csrf_token%}
+      {{formset.images.management_form}}
+      <ul class="no-marker" >
+      {% for form in formset.images%}
+        <li class="item-add-list">
+          <div class="input-fields">
+            {% for hidden in form.hidden_fields%}
+              {{ hidden }}
+            {% endfor %}
+            {% if form.instance.id is None %}
+              {{ form.image }}
+              </div>
+              <div class="button-fields">
+                <button name='action' value='{{form.prefix}}' type="submit" class="btn btn-outline-secondary">&#x2713;</button>
+              </div>
+            {% else %}
+              {{ form.image }}
+              </div>
+              <div class="button-fields">
+                <button name='action' value='{{form.prefix}}-DELETE' type="" class="btn btn-outline-danger">&times;</button>
+              </div>
+            {% endif %}
+        </li>
+        <p>{{form.errors}}</p>
+      {% endfor %}
+      </ul>
+      {{ formset.images.non_form_errors }}
+
+  </br>
+  <button name='action' value='done' type="submit" class="btn btn-outline-primary">Done</button>
+  <button name='action' value='delete' type="submit" class="btn btn-outline-danger">Remove</button>
 </form>
+
 {% endblock %}
+
+{% block scripts %}
+<script>
+
+// var x = document.getElementById("directions-list").lastChild.innerHTML;
+//  function submitOnEnter(event){
+//    if(event.which === 13 && !event.shiftKey){
+//      event.target.form.dispatchEvent(new Event("submit", {cancelable: true}));
+//      event.preventDefault();
+//    }
+//  }
+  //document.querySelectorAll('[id^=id_directions-\d+-body]').addEventListener("keypress", alert('Hello'));
+// document.getElementById("id_directions-1-body").addEventListener("keypress", submitOnEnter)
+</script>
+{% endblock%}

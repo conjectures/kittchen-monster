@@ -11,9 +11,9 @@
 }
 
 .form-items-wrapper {
-    display: inline-block;
+    display: inline-flex;
     flex: 1;
-    max-width: 100%;
+    width: 100%;
     margin-top: 1 auto;
     text-align: center;
 }
@@ -39,7 +39,6 @@ li.item-add-list {
  }
 
 form.ingredients{ 
-    display: flex;
     max-width: 100%
 }
 
@@ -151,3 +150,19 @@ li.latest-recipes-list {
     margin-bottom: 0.5em;
 }
 
+.logo-image {
+    width: calc(3rem + 8vw);
+
+    height: auto;
+}
+
+.pill-button {
+  border: none;
+  padding: 1px 3px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 16px;
+}

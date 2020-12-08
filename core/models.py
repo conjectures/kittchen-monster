@@ -3,6 +3,7 @@ from datetime import date, datetime
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from ordered_model.models import OrderedModel
 
 
 # Post
@@ -10,10 +11,10 @@ class Post(models.Model):
     title = models.CharField(max_length=100, unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # delete blogs of deleted user
     ingredients = models.ManyToManyField('Ingredient', through='IngredientTable', help_text='Input ingredients', blank=True)
-    # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
     posted_at = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField('Category', blank=True)
+    # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} by {self.author}"
@@ -53,29 +54,41 @@ class IngredientTable(models.Model):
             (TSP, _('tsp')),
             (TBS, _('tbsp')),
             ]
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='items', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     unit = models.CharField(
-            max_length=32,
+            max_length=33,
             choices=UNIT,
             blank=True,
             )
-    quantity = models.DecimalField(max_digits=8, decimal_places=3)           # store as character then make into integer
+    # store as character then make into integer
+    quantity = models.DecimalField(max_digits=8, decimal_places=3)
 
     def __str__(self):
-        return f"{self.quantity} {self.unit} of {self.ingredient} for {self.post.title}"
+        try:
+            return f"{self.quantity} {self.unit} of {self.ingredient} for {self.post.title}"
+        except (Ingredient.DoesNotExist, Post.DoesNotExist):
+            # If ingredient table is instantiated without complete fields print the following
+            return f"Incomplete object IntegerTable"
 
     def get_units(self):
         return self.get_unit_display()
 
 
-class Direction(models.Model):
+class Direction(OrderedModel):
     recipe = models.ForeignKey(Post, related_name='directions', on_delete=models.CASCADE)
-    position = models.IntegerField(blank=True)
     body = models.CharField(max_length=100)
+    order_with_respect_to = 'recipe'
+
+    class Meta(OrderedModel.Meta):
+        pass
 
     def __str__(self):
-        return f"Direction {self.position} for {self.recipe.title}: {self.body}"
+        try:
+            return f"Direction for {self.recipe.title}: {self.body}"
+        except (Post.DoesNotExist):
+            # If ingredient table is instantiated without complete fields print the following
+            return f"Incomplete object Direction"
 
 
 class Image(models.Model):

@@ -3,25 +3,25 @@
     color: #e67e22;
     border-color: #e67e22;
 }
-.btn-primary, .btn-outline-primary:hover{
+.btn-primary, .badge-primary, .btn-outline-primary:hover{
     background-color: #e67e22;
     border-color: #e67e22;
     color: white;
 }
-.btn-primary:hover {
+.btn-primary:hover, .badge-primary {
     background-color: #D6741D;
     border-color: #D6741D;
     color: white;
 }
-.btn-primary:focus, .btn-outline-primary:focus {
+.btn-primary:focus, .btn-outline-primary:focus, .badge-primary:focus {
     box-shadow: 0 0 0 0.2rem rgba(236, 126, 34, 0.3);
 }
-.btn-primary:active, .btn-primary:visited {
+.btn-primary:active, .btn-primary:visited, .badge-primary:active {
     background-color: #C86A17;
     border-color: #C86A17;
     color: white;
 }
-.btn-primary:active:focus, .btn-outline-primary:active:focus {
+.btn-primary:active:focus, .btn-outline-primary:active:focus, .badge-primary:active:focus {
     background-color: #D06200 !important;
     border-color: #D06200 !important;
     color: white !important;

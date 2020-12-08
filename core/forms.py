@@ -6,45 +6,15 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from .models import *
 from .utils.forms import is_empty_form, clean_string, move_to_next_if_exists, parse_form_id
-from django.forms.models import BaseInlineFormSet, inlineformset_factory, modelformset_factory
-
-
-IngredientFormset = inlineformset_factory(
-        Ingredient,
-        IngredientTable,
-        fields=('ingredient', 'unit', 'quantity'),
-        extra=1)
-
-
-class IngredientModelForm(forms.ModelForm):
-
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
-        widgets = {
-                'name': forms.TextInput(attrs={
-                    'class': 'form-control',
-                    'width': '100%',
-                    })
-                }
-
-    def clean_name(self, *args, **kwargs):
-        name = self.cleaned_data.get("name")
-        if Ingredient.objects.filter(name=name).exists():
-            raise ValidationError(_(f"The ingredient name '{name}'' already exists"))
-
-        return name
-
-
-IngredientModelFormset = modelformset_factory(Ingredient, form=IngredientModelForm, fields=('name',))
+from django.forms.models import BaseInlineFormSet, inlineformset_factory, modelformset_factory, ModelMultipleChoiceField, ModelChoiceField
 
 
 class CategoryModelForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ('name',)
+        fields = ('name', )
         widgets = {
-                'name': forms.TextInput(attrs={'class': 'form-control'}),
+
                 }
 
     @debug
@@ -52,7 +22,6 @@ class CategoryModelForm(forms.ModelForm):
         name = clean_string(self.cleaned_data.get('name'))
         try:
             model_instance = Category.objects.get(name=name)
-            print(f"MODEL INSTANCE {model_instance}")
         except type(self.instance).DoesNotExist:
             return name
         if model_instance.id != self.instance.id:
@@ -62,12 +31,11 @@ class CategoryModelForm(forms.ModelForm):
 
 
 class PostModelForm(forms.ModelForm):
-    "Model form for Recipes"
     class Meta:
         model = Post
-        fields = ('title', )
+        fields = ('title',)
         widgets = {
-                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                'title': forms.TextInput(attrs={'class': 'form-control'})
                 }
 
     def clean_title(self, *args, **kwargs):
@@ -80,237 +48,6 @@ class PostModelForm(forms.ModelForm):
             raise ValidationError(_(f"The recipe name '{title}'' already exists"))
         else:
             return title
-
-
-# Overwrite of TextInput form field render
-class IngredientInput(forms.TextInput):
-    def render(self, name, value, attrs=None, renderer=None):
-        # TODO: softcode object model
-        if type(value) == int:
-            new = Ingredient.objects.get(pk=value).name if value else ''
-            value = new
-        return super().render(name, value, attrs)
-
-
-class IngredientField(forms.ModelChoiceField):
-    # update initial value with instance name (for has_changed to work)
-    # edit `to_python` function to fix validation
-
-    # @debug
-    def prepare_value(self, value):
-        return super().prepare_value(value)
-
-    @debug
-    def to_python(self, value):
-        # Change field key to name
-        self.to_field_name = "name"
-        # Transform name to id
-        if value in self.empty_values:
-            return None
-        try:
-            # Get selection key field
-            key = self.to_field_name or 'pk'
-            # Check if value is of model type
-            if isinstance(value, self.queryset.model):
-                # get id value from model
-                value = getattr(value, key)
-            # Get instance of object with value as key
-            if type(value) == str:
-                value, is_new = self.queryset.get_or_create(**{key: clean_string(value)})
-        except (ValueError, TypeError, ):
-            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
-        except (self.queryset.model.DoesNotExist):
-            raise ValidationError("Choice does not exist", code='invalid_choice')
-        return value
-
-    def has_changed(self, initial, data):
-        # Hasnt changed if field is disabled
-        if self.disabled:
-            return False
-        # Check if initial is empty
-        initial_value = initial if initial is not None else ''
-        # Check if initial is int
-        if type(initial_value) == int:
-            try:
-                # Find object in database else ignore
-                initial_value = self.queryset.model.objects.get(pk=initial_value).name
-            except (self.queryset.model.DoesNotExist):
-                pass
-        # chack if data is empty
-        data_value = data if data is not None else ''
-        # return true if data not equal with initial
-        return str(self.prepare_value(initial_value)) != str(data_value)
-
-
-class IngredientTableForm(forms.ModelForm):
-    class Meta:
-        model = IngredientTable
-        fields = ('ingredient', 'unit', 'quantity')
-        field_classes = {
-                'ingredient': IngredientField,
-                }
-        widgets = {
-                'ingredient': IngredientInput(attrs={
-                     'class': 'form-control',
-                        }),
-                'unit': forms.Select(attrs={
-                    'class': 'form-control',
-                    'style': 'width: 40%',
-                    }),
-                'quantity': forms.NumberInput(attrs={
-                    'class': 'form-control',
-                    'style': 'width: 50%',
-                    })
-                }
-
-    def clean_ingredient(self):
-        ingredient = self.cleaned_data.get("ingredient")
-        ingredient.name = clean_string(ingredient.name)
-        return ingredient
-
-
-class IngredientTableFormset(BaseInlineFormSet):
-    """
-    Base formset with ingredient and ingredietntable forms
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def _should_delete_form(self, form):
-        """
-        Return whether the form should be deleted
-        """
-        if form.cleaned_data.get(forms.formsets.DELETION_FIELD_NAME):
-            return True
-        # Delete form if it was previously filled (and saved) and is now empty
-#        if hasattr(form, 'id'):
-        if ('id' in form.cleaned_data) and (form.cleaned_data['id'] is not None):
-            if form.has_changed() and (not ('ingredient' in form.cleaned_data)):
-                return True
-        return False
-
-    def clean(self, *args, **kwargs):
-        """ Run custom validation checks on formset level """
-        # queryset model: ingredientTable
-        items = []
-        # Check if two forms contain same ingredient
-        for form in self.forms:
-            # check if form is being deleted
-            if self._should_delete_form(form):
-                continue
-            item = form.cleaned_data.get('ingredient')
-            if item in items:
-                raise ValidationError(_("Ingredients must be different"))
-            items.append(item)
-        # No need to check if there are errors
-        # if any(self.errors):
-        #     return
-
-
-class DirectionForm(forms.ModelForm):
-    class Meta:
-        model = Direction
-        fields = ('position', 'body', )
-        widgets = {
-                'position': forms.TextInput(attrs={
-                     'class': 'form-control',
-                     'style': 'width: 3em',
-                        }),
-                'body': forms.Textarea(attrs={
-                    'class': 'form-control',
-                    'rows': 3,
-                    'style': 'resize:none',
-                    }),
-                }
-
-    def clean_body(self):
-        return clean_string(self.cleaned_data.get('body'))
-
-
-class DirectionFormset(BaseInlineFormSet):
-    """ Base formset for direction forms """
-
-    @debug
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __iter__(self):
-        """ Custom iterating method to overwrite formset display order """
-        return iter(
-                sorted(
-                    self.forms,
-                    key=lambda form:
-                        # if position is defined then return it, otherwise return very large number
-                        form['position'].value() if type(form['position'].value()) == int else 99))
-
-    def __getitem__(self, index):
-        return list(self)[index]
-
-    def get_ordering_widget(self):
-        return forms.NumberInput(attrs={
-            'class': 'form-control',
-            'style': 'width: 4em',
-            })
-
-    def clean(self):
-        """ Clean method by providing index to new form if it doesn't exist """
-        # Set position as largest than previous if position field is empty
-        previous_position = 0
-        positions = {}
-        # Iterate through forms and check their order
-        for form in self.forms:
-            if self._should_delete_form(form) or self._is_empty_form(form):
-                continue
-
-            if 'position' in form.cleaned_data and form.cleaned_data['position'] is not None:
-                current = form.cleaned_data.get('position')
-            else:
-                # Change cleaned data and form instance data before
-                current = previous_position + 1
-                form.cleaned_data['position'] = current
-                form.instance.position = current
-
-            previous_position = current
-
-    # TODO restructure ordering if form is deleted
-    def save(self, *args, **kwargs):
-        """ Save method by fixing ordering of each instance / form """
-        positions = {}
-        current = 1
-        # Iterate through valid forms
-        for form in self.forms:
-            if self._should_delete_form(form) or self._is_empty_form(form):
-                continue
-            current = form.cleaned_data.get('position')
-            if current:
-                # Recursive function that places forms in dictionary with keys according 
-                # to their order and shifts to next available if new is introduced
-                move_to_next_if_exists(positions, current, form)
-        # Iterate through dictionary and apply changes to order
-        for key, form in positions.items():
-            form.instance.position = key
-            form.save()
-        return super().save(*args, **kwargs)
-
-    def _should_delete_form(self, form):
-        """ Return whether the form should be deleted """
-        if form.cleaned_data.get(forms.formsets.DELETION_FIELD_NAME):
-            return True
-        # Delete form if it was previously filled (and saved) and is now empty
-        if ('id' in form.cleaned_data) and (form.cleaned_data['id'] is not None):
-            if form.has_changed() and (not ('body' in form.cleaned_data)):
-                return True
-        return False
-
-    def _is_empty_form(self, form):
-        """
-        Formset form is empty if no instance yet and body field is empty.
-        In formset class as it needs access to 'cleaned_data' from formset
-        """
-        if not form.instance.id and not form.cleaned_data.get('body'):
-            return True
-        return False
 
 
 class ImageField(forms.ClearableFileInput):
@@ -332,10 +69,6 @@ class ImageForm(forms.ModelForm):
         model = Image
         fields = ('image', )
 
-        @debug
-        def clean_image(self, *args, **kwargs):
-            super().clean_image(*args, **kwargs)
-
 
 class ImageFormset(BaseInlineFormSet):
     """ Base formset for adding images """
@@ -347,7 +80,6 @@ class ImageFormset(BaseInlineFormSet):
                 print("FORM SHOULD BE DELETED")
         super().clean(*args, **kwargs)
 
-    @debug
     def _should_delete_form(self, form):
         """ Check if DELETE button was pressed """
         if form.cleaned_data.get(forms.formsets.DELETION_FIELD_NAME):
@@ -363,27 +95,6 @@ class ImageFormset(BaseInlineFormSet):
         return False
 
 
-PostIngredientTableFormset = inlineformset_factory(
-        Post,
-        IngredientTable,
-        fields=('ingredient', 'unit', 'quantity'),
-        form=IngredientTableForm,
-        formset=IngredientTableFormset,
-        extra=1,
-        can_delete=False,
-        )
-
-PostDirectionFormset = inlineformset_factory(
-        Post,
-        Direction,
-        fields=('position', 'body'),
-        formset=DirectionFormset,
-        form=DirectionForm,
-        extra=1,
-        can_delete=False,
-        # can_order=True,
-        )
-
 PostImageFormset = inlineformset_factory(
         Post,
         Image,
@@ -393,4 +104,155 @@ PostImageFormset = inlineformset_factory(
         extra=1,
         # can_delete=True,
         )
+
+
+class CategoryInputField(ModelMultipleChoiceField):
+    widget = forms.TextInput(attrs={'class': 'form-control'})
+
+    @debug
+    def clean(self, value, *args, **kwargs):
+        print(f"{self=}")
+        if value is not None:
+            print(f"{value.split(',')=}")
+            value = [clean_string(item.strip()) for item in value.split(',')]
+            print(f"{value=}")
+        return super().clean(value)
+
+
+class PostCategoryForm(forms.ModelForm):
+    "Model form for Recipes"
+    categories = CategoryInputField(
+            required=False,
+            queryset=Category.objects.filter(),
+            to_field_name='name',
+            initial='',
+            )
+
+    def __init__(self, *args, **kwargs):
+
+        instance = kwargs.get('instance', None)
+        kwargs.update(initial={
+            'categories': '',
+            })
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Post
+        fields = ('categories', )
+
+    # return entered categories with already selected
+    def clean_categories(self, *args, **kwargs):
+        cleaned_data = self.cleaned_data.get('categories', None)
+        existing_categories = self.instance.categories.all()
+        # Combine existing categories with cleaned data
+        return existing_categories | cleaned_data
+
+
+class IngredientInputField(ModelChoiceField):
+    widget = forms.TextInput(attrs={'class': 'form-control'})
+
+    def clean(self, value, *args, **kwargs):
+        value = clean_string(value)
+        # If no value, raise validation error.
+        if not value:
+            print("Value not entered")
+            raise ValidationError(self.error_messages['required'], code='required')
+        # Else try to return queryset of ingredient, or create
+        # TODO: Check if value exists as plural/ singular
+        value, is_new = self.queryset.get_or_create(**{'name': value})
+        return super().clean(value)
+
+
+class PostIngredientTableForm(forms.ModelForm):
+    ingredient = IngredientInputField(
+            required=False,
+            queryset=Ingredient.objects.filter(),
+            to_field_name='name',
+            )
+    post = ModelChoiceField(
+            required=False,
+            queryset=Post.objects.filter(),
+            )
+    quantity = forms.DecimalField(
+            required=False,
+            widget=forms.NumberInput(attrs={'class': 'form-control'})
+            )
+
+    class Meta:
+        model = IngredientTable
+        fields = ('ingredient', 'unit', 'quantity')
+        widgets = {
+                'unit': forms.Select(attrs={
+                    'class': 'form-control',
+                    # 'style': 'width: 40%',
+                    }),
+                }
+
+    def __init__(self, *args, **kwargs):
+        self.dependent = kwargs.pop('instance', None)
+        kwargs.update({'instance': None})
+        opts = self._meta
+        super().__init__(*args, **kwargs)
+
+    @debug
+    def save(self, commit=True):
+        ingredient_table_instance = super().save(commit=False)
+        ingredient_table_instance.post = self.dependent
+        ingredient_table_instance.save()
+        return ingredient_table_instance
+
+
+class PostDirectionForm(forms.ModelForm):
+    """ Directions form """
+    recipe = ModelChoiceField(
+            required=False,
+            queryset=Post.objects.filter(),
+            )
+    position = forms.IntegerField(
+            required=False,
+            widget=forms.NumberInput(attrs={
+                'class': 'form-control',
+                }),
+            )
+    body = forms.CharField(
+            widget=forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'style': 'resize:none',
+                }),
+            required=False,
+            )
+
+    # position = forms.NumberInput()
+
+    def __init__(self, *args, **kwargs):
+        self.dependent = kwargs.pop('instance', None)
+        kwargs.update({'instance': None})
+        opts = self._meta
+        super().__init__(*args, **kwargs)
+
+    def clean_body(self, *args, **kwargs):
+        value = self.cleaned_data.get('body', None)
+        if value:
+            value = clean_string(value)
+            self.cleaned_data['body'] = value
+        else:
+            raise ValidationError("This field is required.")
+        return value
+
+    def save(self, commit=True):
+        # check if position was given
+        dir_instance = super().save(commit=False)
+        dir_instance.recipe = self.dependent
+        dir_instance.save()
+        position = self.cleaned_data.get('position', None)
+        if position:
+            dir_instance.to(position-1)
+        else:
+            dir_instance.bottom()
+        return dir_instance
+
+    class Meta:
+        model = Direction
+        fields = ('position', 'body', )
 

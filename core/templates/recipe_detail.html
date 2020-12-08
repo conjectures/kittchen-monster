@@ -19,10 +19,14 @@
   <div class="header-image-container">
     <img src="{{post.images.first.image.url}}" class="header-image">
   </div>
+<h2>Tags</h2>
+{% for tag in post.categories.all %}
+<p>{{tag.name}}</p>
+{% endfor%}
 
 <h2>Ingredients</h2>
 <ul>
-{%for ing in post.ingredienttable_set.all %}
+{%for ing in post.items.all %}
 <p>{{ing.quantity}} {{ing.unit}} {{ing.ingredient}}</p>
 {% endfor %}
 </ul>
@@ -30,7 +34,7 @@
 <h2>Method</h2>
 <ul>
 {%for direction in post.directions.all %}
-<p>{{direction.position}}. {{direction.body}}</p>
+<p>{{forloop.counter}}. {{direction.body}}</p>
 {% endfor %}
 </ul>
 <h2>Gallery</h2>
