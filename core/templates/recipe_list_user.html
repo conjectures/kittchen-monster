@@ -6,7 +6,7 @@
 {% block content %}
 </br>
   {% if post_list %}
-  <div class="widget-container">
+  <div class="widget-square-container">
     {% for recipe in post_list %}
     <a href="{{recipe.get_absolute_url}}">
       <div
@@ -14,7 +14,7 @@
         style="background-image:
               linear-gradient(to bottom, rgba(37,37,37,0) 30%, rgba(37,37,37,0.3) 60%, rgba(37,37,37,1)),
               url({{recipe.images.first.image.url}});">
-        {{recipe.title}}
+        <span style="position:absolute;bottom: 0;margin: .5em .5em;">{{recipe.title}}</span>
       </div>
     </a>
     {% endfor %}

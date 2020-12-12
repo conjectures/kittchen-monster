@@ -13,6 +13,7 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
+      <!--
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Dropdown
@@ -24,7 +25,6 @@
           <a class="dropdown-item" href="#">Something else here</a>
         </div>
       </li>
-      <!--
       <li class="nav-item">
         <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
       </li>
@@ -51,9 +51,12 @@
       </li>
       {% endif %}
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    <form action="{% url 'recipe_browse' %}" method="get" class="form-inline my-2 my-lg-0">
+     <div class="form-group has-search">
+        <span class="fa fa-search form-control-feedback"></span>
+        <input name="pattern" type="text" class="form-control" placeholder="Search">
+      </div>
     </form>
+
   </div>
 </nav>

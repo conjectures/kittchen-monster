@@ -1,5 +1,4 @@
-
-.btn-outline-primary {
+.btn-outline-primary, .badge-outline-primary {
     color: #e67e22;
     border-color: #e67e22;
 }
@@ -21,11 +20,21 @@
     border-color: #C86A17;
     color: white;
 }
-.btn-primary:active:focus, .btn-outline-primary:active:focus, .badge-primary:active:focus {
+.btn-primary:active:focus, .btn-outline-primary:active:focus, .badge-primary:active:focus, {
     background-color: #D06200 !important;
     border-color: #D06200 !important;
     color: white !important;
     box-shadow: 0 0 0 0.2rem rgba(236, 126, 34, 0.3) !important;
+}
+
+.pill-active {
+    background-color: #D06200 !important;
+    border-color: #C86A17 !important;
+    color: white !important;
+}
+.pill-active:hover{
+    background-color: #e67e22 !important;
+    color: white !important;
 }
 
 .dropdown-item:active{
@@ -40,3 +49,4 @@
     border-color: #e67e22;
     box-shadow: 0 0 0 0.2rem rgba(236, 126, 34, 0.3)
 }
+

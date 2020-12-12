@@ -5,6 +5,8 @@
 
 {% block content %}
 
+<hr>
+
 <h2>Latest Recipes</h1>
 <ul class="no-marker">
     {% for blog in recipe_list%}
@@ -19,8 +21,8 @@
         </a>
       </li>
     {% endfor %}
-    <div>
-      <a href="#">See all</a>
+    <div style="display: flex-end;">
+      <a style="float:right;"href="{% url 'recipe_browse'%}">See all</a>
     </div>
 </ul>
 {% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block head_title %}Browse Recipes{% endblock %}
+{% block body_title %}Browse{% endblock %}
+
+{% block content %}
+
+<form class="filter" action="" method="get">
+  <div style="display: inline-flex;">
+    {{ form.pattern }}
+    {{ form.filter_by.as_hidden }}
+    <input type="submit" name="" value="Submit" class="btn btn-outline-primary">
+  </div>
+
+<div id="app">
+  <tag-item
+    v-for="item in data_list"
+    v-bind:itm="item"
+    v-bind:key="item.id"
+    v-bind:class="{'pill-active': item.active}"
+    :key="item.id"
+    v-on:submit-method="submitCategory()"
+    ></tag-item>
+</div>
+</form>
+<ul class="no-marker">
+    {% for blog in recipe_list %}
+    <hr class="small-margin">
+      <li class="widget-container-browse">
+        <a href="{{blog.get_absolute_url}}" class="latest-recipes-item">
+          <div class="widget-image-square" style="background-image: url({{blog.images.first.image.url}});"></div>
+          <div class="widget-info">
+            <div class="widget-info-title">{{blog.title}}</div>
+            <div>
+            {% for tag in blog.categories.all %}
+              <span class="widget-info-tags">#{{tag.name}}</span>
+            {% endfor %}
+            </div>
+            <div>
+              <span class="far fa-clock"> {{blog.cooking_time}}'</span> 
+            </div>
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+  // Fix GET method
+  var tagItem = {
+    props: ['itm'],
+    delimiters: ["[[", "]]"],
+    template: `<div v-on:click="toggleActivate(itm);$emit('submit-method')" class="badge badge-pill badge-outline-primary pill-tag">
+                <input type="submit" class="tag-span" :value=[[itm.text]]>
+               </div>`,
+  methods: {
+      toggleActivate(itm) {
+        itm.active = !itm.active;
+      },
+  }
+  }
+
+  var app = new Vue({
+    el: '#app',
+    delimiters: ["[[", "]]"],
+    components: {
+      'tag-item': tagItem,
+    },
+    data: {
+      data_list: [
+        {% for tag in filter_list %}
+        { id: {{forloop.counter0}}, text: '{{tag}}', active:{% if tag.name in active_list %}true{%else%}false{%endif%} },
+        {% endfor %}
+      ],
+      active_list: [
+        {% for tag in active_list %}
+        { id: {{forloop.counter0}}, text: '{{tag}}'},
+        {% endfor %}
+      ]
+    },
+  methods: {
+      submitCategory () {
+        filterForm = document.getElementById("id_filter_by");
+        active_list = [];
+        for (const dict of this.data_list){
+          if (dict['active']) {
+            active_list.push(dict['text'])
+          }
+        }
+        active_list = active_list.join(' ')
+        console.log(active_list)
+        filterForm.value = active_list;
+      },
+      // Fix post
+  },
+})
+
+</script>
+
+{% endblock%}

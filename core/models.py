@@ -14,6 +14,8 @@ class Post(models.Model):
     posted_at = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField('Category', blank=True)
+    cooking_time = models.PositiveIntegerField(default=0)
+    servings = models.PositiveIntegerField(default=4)
     # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
 
     def __str__(self):
@@ -105,7 +107,6 @@ class Category(models.Model):
 # class TestModel(models.Model):
 #     name = models.CharField(max_length=50, unique=True)
 #     image = models.ImageField(null=True, blank=True, upload_to="images/")
-# 
 #     def __str__(self):
 #         return self.name
 

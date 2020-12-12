@@ -10,8 +10,21 @@
   <form class="recipe" action="" method="post">
     {%csrf_token%}
     {{formset.recipe.title}}
+    </br>
+    <div style="display:block;">
+      <div style="display:inline; float:right;">
+        <span style="width:100%;">{{formset.recipe.cooking_time.label}}</span>
+        {{formset.recipe.cooking_time}}
+      </div>
+      <div style="display:inline; float:right;">
+        <span style="width:100%;">{{formset.recipe.servings.label}}</span>
+        {{formset.recipe.servings}}
+      </div>
+    </div>
     <input name='action' value='recipe' type="submit" style="visibility: hidden" >
   </form>
+
+    <hr>
 
   <h2>Categories</h2>
   <form class="categories" action="" method="post">
@@ -32,7 +45,7 @@
     {% endfor %}
   </form>
 
-
+    <hr>
 
   <h2>Ingredients</h2>
     {% for field in formset.items %}
@@ -44,21 +57,22 @@
       {% for hidden in formset.items.hidden_fields %}
         {{ hidden }}
       {% endfor%}
-      {{formset.items.ingredient}}
-      {{formset.items.unit}}
       {{formset.items.quantity}}
+      {{formset.items.unit}}
+      {{formset.items.ingredient}}
       <button name='action' value='items' type="submit" class="btn btn-outline-secondary">Insert</button>
     </div>
     <div class="form-itmes-wrapper">
       {% for tag in recipe.items.all %}
         <div>
           <button name="action" value="items-{{tag.id}}-REMOVE" type="submit" class="badge badge-pill badge-primary pill-button">&times;</button>
-          {{tag.quantity}} {{tag.unit}} of {{tag.ingredient}}
+          {{tag.quantity}} {{tag.unit}} {{tag.ingredient|lower}}
         </div>
       {% endfor %}
       </div>
     </form>
 
+    <hr>
 
 
   <h2>Instructions</h2>
@@ -84,6 +98,8 @@
       {% endfor %}
       </div>
     </form>
+
+    <hr>
 
     <h2>Images</h2>
 <form class="images" action="" method="post" enctype="multipart/form-data">

@@ -10,11 +10,12 @@
 </div>
 {% endif %}
 {% if category_list %}
-  <ul class="no-marker">
+  <ul class="">
     {% for category in category_list %}
         <li class="categories-list">
           <div class="btn-group dropdown">
-            <button type"button" class="btn btn-outline-secondary">{{category.name}}</button>
+            <a href="{% url 'recipe_browse' %}?filter_by={{category.name}}">{{category.name}}
+            </a>
             {% if user.is_staff %}
               <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
               <div class="dropdown-menu">

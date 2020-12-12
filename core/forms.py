@@ -30,12 +30,34 @@ class CategoryModelForm(forms.ModelForm):
             return name
 
 
-class PostModelForm(forms.ModelForm):
+class PostTitleForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title',)
         widgets = {
                 'title': forms.TextInput(attrs={'class': 'form-control'})
+                }
+
+    def clean_title(self, *args, **kwargs):
+        title = clean_string(self.cleaned_data.get("title"))
+        try:
+            model_instance = Post.objects.get(title=title)
+        except type(self.instance).DoesNotExist:
+            return title
+        if model_instance.id != self.instance.id:
+            raise ValidationError(_(f"The recipe name '{title}'' already exists"))
+        else:
+            return title
+
+
+class PostModelForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'cooking_time', 'servings', )
+        widgets = {
+                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                'cooking_time': forms.NumberInput(attrs={'class': 'form-control'}),
+                'servings': forms.NumberInput(attrs={'class': 'form-control'}),
                 }
 
     def clean_title(self, *args, **kwargs):
@@ -149,7 +171,10 @@ class PostCategoryForm(forms.ModelForm):
 
 
 class IngredientInputField(ModelChoiceField):
-    widget = forms.TextInput(attrs={'class': 'form-control'})
+    widget = forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Ingredient',
+        })
 
     def clean(self, value, *args, **kwargs):
         value = clean_string(value)
@@ -175,7 +200,10 @@ class PostIngredientTableForm(forms.ModelForm):
             )
     quantity = forms.DecimalField(
             required=False,
-            widget=forms.NumberInput(attrs={'class': 'form-control'})
+            widget=forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Quantity',
+                })
             )
 
     class Meta:
@@ -184,6 +212,7 @@ class PostIngredientTableForm(forms.ModelForm):
         widgets = {
                 'unit': forms.Select(attrs={
                     'class': 'form-control',
+                    'placehodler': 'unit'
                     # 'style': 'width: 40%',
                     }),
                 }
@@ -255,4 +284,29 @@ class PostDirectionForm(forms.ModelForm):
     class Meta:
         model = Direction
         fields = ('position', 'body', )
+
+
+class SearchForm(forms.Form):
+    pattern = forms.CharField(
+            required=False,
+            widget=forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Search...',
+                }),
+            )
+    filter_by = forms.ModelChoiceField(
+            required=False,
+            queryset=Category.objects.filter(),
+            to_field_name='name',
+            widget=forms.Select(attrs={
+                'class': 'form-control',
+                'style': 'display: flex;'
+                }),
+            )
+
+    def __init__(self, *args, filter_tags=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filter_tags = filter_tags
+        if filter_tags:
+            self.fields['filter_by'].queryset = Category.objects.all().exclude(name__in=filter_tags)
 

@@ -1,3 +1,11 @@
+body {
+    font-family: Helvetica;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
 .btn-round {
     border-radius: 30px;
     margin: 0;
@@ -59,6 +67,8 @@ form.ingredients{
     max-width: 100%;
     object-fit: cover;
     align-self: center;
+    margin-top: 0.1em;
+    margin-bottom: 1em;
 }
 
 .header-image-container { 
@@ -89,8 +99,6 @@ form.ingredients{
     min-width:  10%;
     background: #252525;
     color: white;
-    text-decoration: none;
-    font-weight: bold;
     font-size: calc(0.3rem + 1.2vw);
     display: flex;
     justify-content: flex-start;
@@ -99,8 +107,8 @@ form.ingredients{
 }
 div > a:hover,
 li > a:hover{
-    color: white;
-    text-decoration-color: white;
+    color: inherit;
+    text-decoration-color:white;
 }
 li.latest-recipes-list {
     margin-top: 1em;
@@ -125,20 +133,20 @@ li.latest-recipes-list {
     min-height: 95vh;
 }
 .widget-image-square {
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1));
+    background-image: linear-gradient(to bottom, rgba(37,37,37,0), rgba(37,37,37,1));
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
     min-width: 15vw;
     height: 15vw;
-    display: flex;
+   /* display: flex; */
     color: white;
     text-decoration: none;
     font-weight: bold;
     font-size: calc(0.3rem + 1.2vw);
-
+    position: relative;
 }
-.widget-container {
+.widget-square-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(auto-fill, 15vw);
@@ -152,7 +160,6 @@ li.latest-recipes-list {
 
 .logo-image {
     width: calc(3rem + 8vw);
-
     height: auto;
 }
 
@@ -162,7 +169,85 @@ li.latest-recipes-list {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  margin: 4px 2px;
+  margin: 5px 2px;
   cursor: pointer;
   border-radius: 16px;
+}
+
+.has-search .form-control-feedback {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 2.375rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #aaa;
+}
+
+.has-search .form-control {
+    padding-left: 2.375rem;
+}
+
+.pill-tag {
+    margin: 5px 2px;
+}
+
+.tag-span.tag-span {
+    color: inherit;
+    background-color: transparent;
+    border: none;
+}
+.tag-span:active:focus, .tag-span:focus{
+    color: inherit;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+.widget-image-square-small {
+    background-image: linear-gradient(to bottom, rgba(37,37,37,0), rgba(37,37,37,1));
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    min-width: 10vw;
+    height: 10vw;
+   /* display: flex; */
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: calc(0.3rem + 1.5vw);
+    position: relative;
+}
+.widget-container-browse {
+    margin: 9px 10px;
+}
+
+.widget-info {
+    font-size: calc(0.3rem + 1.5vw);
+    font-weight: bold;
+    color: #252525;
+    margin: .3em 1.3em;
+    display: flex-row;
+}
+.widget-info-title:hover {
+    color: black;
+    text-decoration:underline;
+    border-color: #252525;
+}
+.widget-info-tags {
+    color: #e67e22;
+    font-weight: normal;
+    font-size: calc(0.3rem + .5vw);
+}
+
+.small-margin {
+    margin: .1em .1em;
+}
+
+.container-inline {
+    display: flex;
+    justify-content: space-around;
+
 }

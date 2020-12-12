@@ -12,24 +12,44 @@
 {% endif %}
 
 <p><strong>by {{ post.author }}</strong></p>
-<p><small><em>Posted: {{post.posted_at}}</em></small></p>
+<div style="">
+<p class="small-margin"><small><em>Posted: {{post.posted_at}}</em></small></p>
 {% if post.posted_at|date:"YmdHis" < post.last_edited|date:"YmdHis" %}
-  <p><small><em>Edited: {{post.last_edited}}</em></small></p>
-  {% endif%}
+  <p class="small-margin"><small><em>Last Edited: {{post.last_edited}}</em></small></p>
+{% endif%}
+</div>
   <div class="header-image-container">
     <img src="{{post.images.first.image.url}}" class="header-image">
   </div>
-<h2>Tags</h2>
+<div>
 {% for tag in post.categories.all %}
-<p>{{tag.name}}</p>
+<span class="widget-info-tags" style="font-size: calc(0.5rem + 1vw);">#{{tag.name}} </span>
 {% endfor%}
+</div>
+</br>
+
+<div class="container-inline">
+  <div class="container-vertical">
+    <div class="far fa-clock"></div> 
+    <div>{{post.cooking_time}}'</div>
+  </div>
+  <div class="container-verticla">
+    <div class="fas fa-utensils"></div> 
+    <div>{{post.servings}}</div>
+  </div>
+</div>
+
+
+<hr>
 
 <h2>Ingredients</h2>
 <ul>
 {%for ing in post.items.all %}
-<p>{{ing.quantity}} {{ing.unit}} {{ing.ingredient}}</p>
+<p>{{ing.quantity|floatformat}}{{ing.unit}} {{ing.ingredient}}</p>
 {% endfor %}
 </ul>
+
+<hr>
 
 <h2>Method</h2>
 <ul>
@@ -37,6 +57,7 @@
 <p>{{forloop.counter}}. {{direction.body}}</p>
 {% endfor %}
 </ul>
+<!--
 <h2>Gallery</h2>
 <div class="widget-container">
   {% for img in post.images.all %}
@@ -53,10 +74,9 @@
 
 </div>
 
-{% endblock %}
 
-<!--
 {% for img in post.images.all %}
   <img src="{{img.image.url}}">
 {% endfor %}
 -->
+{% endblock %}
