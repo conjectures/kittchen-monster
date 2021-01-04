@@ -23,7 +23,7 @@
   </div>
 <div>
 {% for tag in post.categories.all %}
-<span class="widget-info-tags" style="font-size: calc(0.5rem + 1vw);">#{{tag.name}} </span>
+<a href="{% url 'recipe_browse' %}?filter_by={{category.name}}" class="widget-info-tags" style="font-size: calc(0.5rem + 1vw);">#{{tag.name}} </a>
 {% endfor%}
 </div>
 </br>

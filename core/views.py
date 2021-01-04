@@ -1,7 +1,7 @@
 import re
 from core.utils.debug import debug
 from core.utils.multiform import *
-from core.utils.forms import get_name_with_flag, get_id_with_flag, parse_form_id, is_formset, is_dictionary
+from core.utils.forms import parse_form_id, is_formset, is_dictionary
 from .forms import *
 
 from django.core.exceptions import PermissionDenied
@@ -15,8 +15,6 @@ from django.contrib.auth.models import User
 from django.views.generic.detail import SingleObjectMixin
 from django.forms import inlineformset_factory, modelformset_factory
 from django.db.models import Q
-# from .forms import IngredientModelFormset
-
 
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import FormMixin, ProcessFormView
@@ -293,21 +291,16 @@ class RecipeBrowse(ListView):
     model = Post
     context_object_name = 'recipe_list'
     template_name = 'recipe_browse.html'
-    paginate_by = 5
+    # paginate_by = 5
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def get_queryset(self):
-        print("GETTING QUERYSET")
         self.queryset = Post.objects.all()
         return self.queryset
 
     def get(self, request, *args, **kwargs):
-        print("GET METHOD")
-        # Load form
-        print(f"{request.GET=}")
-
         # Load queryset if first time get is called
         if not hasattr(self, 'object_list'):
             self.object_list = self.get_queryset()
@@ -325,14 +318,11 @@ class RecipeBrowse(ListView):
         pattern = request.GET.get('pattern', None)
         category_list = request.GET.get('filter_by', None)
         category_list = category_list.split() if category_list is not None else []
-        print(f"{category_list=}")
         form = SearchForm(request.GET or None, filter_tags=category_list)
         # category_list = Category.objects.get(pk=category_list)
         qs = self.filter_queryset(category_list=category_list, pattern=pattern)
 
         context = self.get_context_data(recipe_list=qs, form=form, filter_list=Category.objects.all(), active_list=category_list)
-        print(f"{self.object_list=}")
-        print(f"{context=}")
         return self.render_to_response(context)
 
     def filter_queryset(self, qs=None, category_list=None, pattern=None):

@@ -1,10 +1,13 @@
 
-from . import views
+from django.views.generic import RedirectView
 from django.urls import path
+
+from . import views
 
 
 urlpatterns = [
-        path('', views.HomeView.as_view(), name='home'),
+        path('', RedirectView.as_view(url='home/', permanent=True)),
+        path('home/', views.HomeView.as_view(), name='home'),
         path('recipe/<int:pk>', views.RecipeDetailView.as_view(), name='recipe_detail'),
         path('recipe/<int:pk>/edit/', views.RecipeUpdateView.as_view(), name='recipe_edit'),
         path('recipe/<int:pk>/delete/', views.RecipeDeleteView.as_view(), name='recipe_delete'),

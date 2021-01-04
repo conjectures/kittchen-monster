@@ -3,6 +3,8 @@ from datetime import date, datetime
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MinValueValidator
+
 from ordered_model.models import OrderedModel
 
 
@@ -14,8 +16,8 @@ class Post(models.Model):
     posted_at = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField('Category', blank=True)
-    cooking_time = models.PositiveIntegerField(default=0)
-    servings = models.PositiveIntegerField(default=4)
+    cooking_time = models.PositiveIntegerField(default=10, validators=[MinValueValidator(1)])
+    servings = models.PositiveIntegerField(default=4, validators=[MinValueValidator(1)])
     # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
 
     def __str__(self):

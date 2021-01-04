@@ -11,6 +11,8 @@
     {%csrf_token%}
     {{formset.recipe.title}}
     </br>
+    <strong>{{formset.recipe.cooking_time.errors}}</strong>
+    <strong>{{formset.recipe.servings.errors}}</strong>
     <div style="display:block;">
       <div style="display:inline; float:right;">
         <span style="width:100%;">{{formset.recipe.cooking_time.label}}</span>

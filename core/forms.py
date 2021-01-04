@@ -14,7 +14,7 @@ class CategoryModelForm(forms.ModelForm):
         model = Category
         fields = ('name', )
         widgets = {
-
+                'name': forms.TextInput(attrs={'class': 'form-control'})
                 }
 
     @debug

@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class RecipeblogConfig(AppConfig):
-    name = 'recipeBlog'
+class CoreConfig(AppConfig):
+    name = 'core'
+    verbose_name = "Core App"

@@ -19,19 +19,48 @@ from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views
+# from django.contrib.auth.models import User
+# from rest_framework import routers, serializers, viewsets
+
+
+"""
+    API
+"""
+
+
+# Serializers define the API representation
+# class UserSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['url', 'username', 'email', 'is_staff']
+
+
+# ViewSets define the view behavior
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+
+
+# Routers provide an easy way of automatically determining the URL conf
+# router = routers.DefaultRouter()
+# router.register(r'users', UserViewSet)
+
 
 urlpatterns = [
     # ADMIN
     path('admin/', admin.site.urls),
-
-    #
-    path('home/', include('core.urls')),
-    path('', RedirectView.as_view(url='home/', permanent=True)),
-
+    # CORE APP
+    path('', include('core.urls')),
+    # path('', RedirectView.as_view(url='home/', permanent=True)),
     # AUTH
     # path('accounts/', include('django.contrib.auth.urls')),
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
+    # API
+    # Wire API using automatic URL routing. Additionally include login URLS for browsable API
+    # path('api', include(router.urls)),
+    path('api/', include('core.api.urls')),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

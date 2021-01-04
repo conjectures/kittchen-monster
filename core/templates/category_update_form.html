@@ -11,10 +11,10 @@
     {{ hidden_field.errors }}
     {{ hidden_field }}
   {% endfor %}
-  {{ form.name}}
   {% for error in form.name.errors %}
     <strong>{{error|escape}}</strong>
   {% endfor %}
+  {{ form.name}}
 
   </br>
   </br>

@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ordered_model',
-    'core',
+    'rest_framework',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -100,6 +101,22 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# REST_FRAMEWORK = {
+#         # Use Django's standard 'django.contrib.auth' permissions,
+#         # or allow read-only access for anauthenticated users.
+#         'DEFAULT_PERMISSION_CLASSES': [
+#             'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+#             ],
+#         'DEFAULT_THROTTLE_CLASSES': [
+#             'rest_framework.throttling.AnonRateThrottle',
+#             'rest_framework.thorttling.UserRateThrottle',
+#             ],
+#         'DEFAULT_THROTTLE_RATES': {
+#             'anon': '100/day',
+#             'user': '1000/day'
+#             }
+#         }
 
 
 # Internationalization
