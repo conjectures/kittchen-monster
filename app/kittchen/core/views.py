@@ -1,7 +1,7 @@
 import re
-from core.utils.debug import debug
-from core.utils.multiform import *
-from core.utils.forms import parse_form_id, is_formset, is_dictionary
+from kittchen.core.utils.debug import debug
+from kittchen.core.utils.multiform import *
+from kittchen.core.utils.forms import parse_form_id, is_formset, is_dictionary
 from .forms import *
 
 from django.core.exceptions import PermissionDenied

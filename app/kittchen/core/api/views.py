@@ -7,9 +7,9 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.generics import get_object_or_404
 from rest_framework import permissions
 
-from core.models import Post
-from core.api.pagination import ListPagination
-from core.api.serializers import (PostListSerializer,
+from kittchen.core.models import Post
+from kittchen.core.api.pagination import ListPagination
+from kittchen.core.api.serializers import (PostListSerializer,
                                   PostDetailSerializer)
 
 

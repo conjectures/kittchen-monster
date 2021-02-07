@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Post, IngredientTable, Ingredient, Category
+from kittchen.core.models import Post, IngredientTable, Ingredient, Category
 
 
 class PostListSerializer(serializers.ModelSerializer):

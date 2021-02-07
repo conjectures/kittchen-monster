@@ -50,7 +50,7 @@ urlpatterns = [
     # ADMIN
     path('admin/', admin.site.urls),
     # CORE APP
-    path('', include('core.urls')),
+    path('', include('kittchen.core.urls')),
     # path('', RedirectView.as_view(url='home/', permanent=True)),
     # AUTH
     # path('accounts/', include('django.contrib.auth.urls')),
@@ -59,7 +59,7 @@ urlpatterns = [
     # API
     # Wire API using automatic URL routing. Additionally include login URLS for browsable API
     # path('api', include(router.urls)),
-    path('api/', include('core.api.urls')),
+    path('api/', include('kittchen.core.api.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 

@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
 # from django.contrib.auth import views
-from core.api import views
+from kittchen.core.api import views
 
 urlpatterns = [
         # path('', include(router.urls)),
