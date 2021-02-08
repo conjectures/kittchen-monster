@@ -16,8 +16,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-print(f"{BASE_DIR=}")
-print(f"{ROOT_DIR=}")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -81,8 +79,12 @@ WSGI_APPLICATION = 'kittchen.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(ROOT_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'django_app',
+        'USER': 'django_user',
+        'PASSWORD': 'BXsWTAbt9qfaHOgHMWdWc6Ntw',
+        'HOST': 'mariadb',
+        'PORT': '3306',
     },
 }
 
@@ -140,7 +142,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 CORE_DIR = os.path.join(BASE_DIR, 'core')
-print(f"{CORE_DIR=}")
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
         os.path.join(CORE_DIR, 'static'),

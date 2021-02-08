@@ -4,8 +4,11 @@ django-filter==2.4.0
 django-ordered-model==3.4.1
 djangorestframework==3.12.2
 greenlet==0.4.17
+gunicorn==20.0.4
 Markdown==3.3.3
 msgpack==1.0.0
+mysqlclient==2.0.3
+neovim==0.3.1
 Pillow==8.0.1
 pynvim==0.4.2
 pytz==2020.4
