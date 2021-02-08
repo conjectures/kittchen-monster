@@ -1,0 +1,30 @@
+version: "3.9"
+volumes:
+  dbdata:
+services:
+  python:
+    image: django-dev:v1.0
+    build:
+      context: .
+      dockerfile: docker/prod/python/Dockerfile
+    volumes:
+      - ./app:/app
+    ports:
+      - 8000:8000
+    working_dir: /app
+    command: cd /app && gunicorn -w 4 kittchen.wsgi -b 0.0.0.0:8000
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: django_app
+      MYSQL_USER: django_user
+      MYSQL_PASSWORD: BXsWTAbt9qfaHOgHMWdWc6Ntw
+    volumes:
+      - dbdata:/var/lib/mysql/django_app
+    ports:
+      - 3306:3306
+
+
+
