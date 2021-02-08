@@ -83,6 +83,7 @@ DATABASES = {
         'NAME': 'django_app',
         'USER': 'django_user',
         'PASSWORD': 'BXsWTAbt9qfaHOgHMWdWc6Ntw',
+        # hostname equivalent to ip for docker-compose container networking
         'HOST': 'mariadb',
         'PORT': '3306',
     },

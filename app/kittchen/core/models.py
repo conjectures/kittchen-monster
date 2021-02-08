@@ -21,7 +21,7 @@ class Post(models.Model):
     # body = models.TextField(max_length=1000, help_text='Recipe body', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.title} by {self.author}"
+        return f"{self.title} by {self.author}."
 
     # Return url
     def get_absolute_url(self):
@@ -111,5 +111,5 @@ class Category(models.Model):
 #     image = models.ImageField(null=True, blank=True, upload_to="images/")
 #     def __str__(self):
 #         return self.name
-
-
+# 
+# 

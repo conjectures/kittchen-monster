@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Descr: Changes the ownership of migrations and other generated files in the docker container so that
+#       they don't require privilege escalation when applied to database
 
 # check who owns the working directory
 USER_ID=$(stat -c "%u" $PWD)
@@ -34,5 +36,5 @@ export HOME=/home/$PYTHON_RUN_USER
 
 
 
-echo "Running command '$*'"
+echo "Running command '$*' - ('python manage.py runserver' from docker-compose)"
 exec su -p - ${PYTHON_RUN_USER} -s /bin/bash -c "$*"
