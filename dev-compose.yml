@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: docker/dev/python/Dockerfile
+    env_file:
+      - .env
     volumes:
       - ./app:/app
     working_dir: /app
