@@ -3,5 +3,11 @@
 neovim==0.3.1
 pynvim==0.4.2
 django-debug-toolbar
+Markdown==3.3.3
+msgpack==1.0.0
+django-filter==2.4.0
+greenlet==0.4.17
+pytz==2020.4
+sqlparse==0.4.1
 
 

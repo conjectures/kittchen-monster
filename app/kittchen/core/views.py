@@ -6,16 +6,16 @@ from .forms import *
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, FormView
 from .models import *
 from django.urls import reverse_lazy, reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import User
-from django.views.generic.detail import SingleObjectMixin
 from django.forms import inlineformset_factory, modelformset_factory
 from django.db.models import Q
 
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, FormView
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import FormMixin, ProcessFormView
 
