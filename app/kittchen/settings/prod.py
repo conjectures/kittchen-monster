@@ -1,8 +1,4 @@
 from kittchen.settings.base import *
 
-# Set debug true for development settings
-
-ALLOWED_HOSTS = ['*']
-
+# Overwrite debug to false
 DEBUG = False
-

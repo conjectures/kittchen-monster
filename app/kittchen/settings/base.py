@@ -10,8 +10,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 # ROOT_DIR = os.path.dirname(APP_DIR)
 
-print(f"{BASE_DIR=}")
-print(f"{ROOT_DIR=}")
+# print(f"{BASE_DIR=}")
+# print(f"{ROOT_DIR=}")
 
 
 env = environ.Env()
@@ -28,8 +28,7 @@ DEBUG = env('DEBUG')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.str('DJANGO_ALLOWED_HOSTS', default='*').split(',')
 
 
 # Application definition
