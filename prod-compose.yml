@@ -25,6 +25,7 @@ services:
     env_file:
       - .env
     environment:
+      MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: $DATABASE_NAME
       MYSQL_USER: $DATABASE_USER
       MYSQL_PASSWORD: $DATABASE_PASSWORD
