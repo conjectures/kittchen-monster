@@ -2,18 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: mariadb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: mysql
-  strategy:
-    type: Recreate
+      name: mariadb
   template:
     metadata:
       labels:
-        app: mysql
+        name: mariadb
     spec:
       containers:
         - name: mariadb
@@ -21,6 +19,11 @@ spec:
           ports:
             - containerPort: 3306
           env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key:  root_password
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
@@ -31,34 +34,32 @@ spec:
                 secretKeyRef:
                   name: mysql-credentials
                   key:  password
-            - name: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
                   name: mysql-credentials
-                  key:  root_password
-            - name: DATABASE_NAME
-              value: 'django_app'
+                  key: db_name
           volumeMounts:
             - mountPath: /var/lib/mysql/data
-              name: mysql-volume-mount
+              name: mariadb-data
       volumes:
-        - name: mysql-volume-mount
+        - name: mariadb-data
           persistentVolumeClaim:
-            claimName: mysql-pv-claim
+            claimName: mariadb-pv-claim
 ---
 # Start Service - expose port
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mariadb
   labels:
-    app: mysql
+    app: mariadb
 spec:
   type: ClusterIP
   ports:
     - port: 3306
   selector:
-    name: mysql
+    name: mariadb
 # Service END
 
 

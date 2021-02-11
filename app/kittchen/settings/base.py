@@ -10,8 +10,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 # ROOT_DIR = os.path.dirname(APP_DIR)
 
-# print(f"{BASE_DIR=}")
-# print(f"{ROOT_DIR=}")
+print(f"{BASE_DIR=}")
+print(f"{ROOT_DIR=}")
 
 
 env = environ.Env()
@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'kittchen.urls'
@@ -156,7 +157,7 @@ CORE_DIR = os.path.join(BASE_DIR, 'core')
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = "/static_files/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (
         os.path.join(CORE_DIR, 'static'),

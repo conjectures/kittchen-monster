@@ -1,0 +1,52 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kittchen
+  labels:
+    app: kittchen
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: kittchen
+  template:
+    metadata:
+      labels:
+        name: kittchen
+    spec:
+      containers:
+        - name: kittchen
+          image: conjectures/kittchen:1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key:  user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key:  password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: db_name
+            - name: MYSQL_HOST
+              value: 'mariadb'
+            - name: DATABASE_URL
+              value: mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_HOST):3306/$(MYSQL_DATABASE)
+            - name: DJANGO_SETTINGS_MODULE
+              value: "kittchen.settings.prod"
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: python-credentials
+                  key: django_secret_key
+            - name: DEBUG
+              value: 'True'

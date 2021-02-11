@@ -4,4 +4,5 @@ djangorestframework==3.12.2
 mysqlclient==2.0.3
 Pillow==8.0.1
 django-environ==0.4.5
+whitenoise>=5.2.0
 
