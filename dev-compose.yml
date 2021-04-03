@@ -4,6 +4,10 @@ volumes:
 services:
   python:
     image: django-dev:v1.0
+    environment:
+      DEBUG: True
+      SECRET_KEY: asdfkqeiocp___udfuu&!!-pdfpsp)ifdy*983&%fdsiizxjcjk+-03s
+      ALLOWED_HOSTS: *
     build:
       context: .
       dockerfile: docker/dev/python/Dockerfile

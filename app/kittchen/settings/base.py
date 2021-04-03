@@ -11,21 +11,28 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = os.path.dirname(BASE_DIR)
 
+print(f"{BASE_DIR=}")
+print(f"{ROOT_DIR=}")
 
+env = environ.Env()
+DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
+ALLOWED_HOSTS = env.str('DJANGO_ALLOWED_HOSTS', default='*').split(',')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'p82n&_s9v33n1kvb!-p)2zu2940p%&+zeddkma-qp!qkk=3sm8'
+# SECRET_KEY = 'p82n&_s9v33n1kvb!-p)2zu2940p%&+zeddkma-qp!qkk=3sm8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+# DEBUG = True
+# ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,20 +84,21 @@ WSGI_APPLICATION = 'kittchen.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
+        'default': env.db()
 #             'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     },
 # }
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_app',
-        'USER': 'django_user',
-        'PASSWORD': 'BXsWTAbt9qfaHOgHMWdWc6Ntw',
-        # hostname equivalent to ip for docker-compose container networking
-        'HOST': 'mariadb',
-        'PORT': '3306',
-    },
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'django_app',
+#         'USER': 'django_user',
+#         'PASSWORD': 'BXsWTAbt9qfaHOgHMWdWc6Ntw',
+#         # hostname equivalent to ip for docker-compose container networking
+#         'HOST': 'mariadb',
+#         'PORT': '3306',
+#     },
 }
 
 
