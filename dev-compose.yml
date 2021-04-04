@@ -3,22 +3,22 @@ volumes:
   dbdata:
 services:
   python:
-    image: django-dev:v1.0
-    environment:
-      DEBUG: True
-      SECRET_KEY: asdfkqeiocp___udfuu&!!-pdfpsp)ifdy*983&%fdsiizxjcjk+-03s
-      ALLOWED_HOSTS: *
     build:
       context: .
       dockerfile: docker/dev/python/Dockerfile
+    environment:
+      DATABASE_URL: mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
+      TAG: 1.6
+      DEBUG: ${DEBUG}
+    env_file: 
+      - .env
     volumes:
       - ./app:/app
     working_dir: /app
     ports:
       - 8000:8000
-    stdin_open: true
-    tty: true
     command: python /app/manage.py runserver 0.0.0.0:8000
+
   mariadb:
     image: mariadb
     restart: always
@@ -32,5 +32,9 @@ services:
     ports:
       - 3306:3306
 
-
-
+  testcontainer:
+    image: python:3.8-slim
+    environment:
+      TAG: 1.5
+    env_file:
+      - python.env

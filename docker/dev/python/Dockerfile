@@ -6,9 +6,10 @@ COPY ./app /app
 
 WORKDIR /app
 
-RUN pip install -r requirements/dev.txt
+RUN pip install -r requirements/prod.txt
 
 COPY ./docker/dev/python/entrypoint.sh /entrypoint.sh
+# COPY .env /.env
 
 RUN chmod +x /entrypoint.sh
 EXPOSE 8000

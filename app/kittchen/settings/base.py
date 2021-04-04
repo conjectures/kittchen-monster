@@ -17,8 +17,6 @@ import environ
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 
-print(f"{BASE_DIR=}")
-print(f"{ROOT_DIR=}")
 
 env = environ.Env()
 DEBUG = env('DEBUG')
@@ -85,20 +83,6 @@ WSGI_APPLICATION = 'kittchen.wsgi.application'
 
 DATABASES = {
         'default': env.db()
-#             'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     },
-# }
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'django_app',
-#         'USER': 'django_user',
-#         'PASSWORD': 'BXsWTAbt9qfaHOgHMWdWc6Ntw',
-#         # hostname equivalent to ip for docker-compose container networking
-#         'HOST': 'mariadb',
-#         'PORT': '3306',
-#     },
 }
 
 

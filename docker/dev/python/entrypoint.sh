@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Descr: Changes the ownership of migrations and other generated files in the docker container so that
 #       they don't require privilege escalation when applied to database
 
