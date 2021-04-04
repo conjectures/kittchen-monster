@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: python-credentials
-  labels:
-    app: kittchen
-type: Opaque
-data:
-  django_secret_key: a2ljY2hpbg==

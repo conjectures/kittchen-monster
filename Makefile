@@ -5,7 +5,7 @@ dev-up:
 	docker-compose -f dev-compose.yml up
 
 prod-build:
-	docker-compose  -f prod-compose.yml build
+	docker-compose  -f docker-compose.yml build
 
 prod-up:
-	docker-compose  -f prod-compose.yml up
+	docker-compose  -f docker-compose.yml up
